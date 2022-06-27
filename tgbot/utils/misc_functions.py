@@ -159,7 +159,7 @@ def get_position_admin(position_id):
 
 
 # Открытие своего профиля
-def open_profile_my(user_id):
+def open_profile_my(user_id, me):
     get_purchases = get_purchasesx(user_id=user_id)
     get_user = get_userx(user_id=user_id)
     count_items = 0
@@ -169,13 +169,14 @@ def open_profile_my(user_id):
     if len(get_purchases) >= 1:
         for items in get_purchases:
             count_items += int(items['purchase_count'])
-
+    link = 'https://t.me/' + me.username + '?start=' + str(user_id)
     return f"<b>👮‍♀️ Ваш профиль:</b>\n" \
            f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
            f"🆔 ID: <code>{get_user['user_id']}</code>\n" \
            f"💰 Баланс: <code>{get_user['user_balance']}₽</code>\n" \
            f"🎁 Куплено товаров: <code>{count_items}шт</code>\n" \
-           f"🕰 Регистрация: <code>{get_user['user_date'].split(' ')[0]} ({convert_day(how_days)})</code>"
+           f"🕰 Регистрация: <code>{get_user['user_date'].split(' ')[0]} ({convert_day(how_days)})</code>\n" \
+           f"👪 Реферальная ссылка:  <code>{link}</code>"
 
 
 # Открытие профиля при поиске

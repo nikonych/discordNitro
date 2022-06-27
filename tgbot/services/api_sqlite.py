@@ -81,6 +81,14 @@ def get_all_usersx():
         sql = "SELECT * FROM storage_users"
         return con.execute(sql).fetchall()
 
+# Получение всех  user_id  пользователей
+def get_all_users_id():
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = lambda cursor, row: row[0]
+        sql = "SELECT user_id FROM storage_users"
+        return con.execute(sql).fetchall()
+
+
 
 # Редактирование пользователя
 def update_userx(user_id, **kwargs):
@@ -467,7 +475,7 @@ def create_dbx():
         con.row_factory = dict_factory
 
         # Создание БД с хранением данных пользователей
-        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 8:
+        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 9:
             print("DB was found(1/8)")
         else:
             con.execute("CREATE TABLE storage_users("
@@ -478,7 +486,8 @@ def create_dbx():
                         "user_balance INTEGER,"
                         "user_refill INTEGER,"
                         "user_date TIMESTAMP,"
-                        "user_unix INTEGER)")
+                        "user_unix INTEGER,"
+                        "user_referer INTEGER DEFAULT 0)")
             print("DB was not found(1/8) | Creating...")
 
         # Создание БД с хранением данных платежных систем

@@ -9,7 +9,7 @@ from tgbot.keyboards.inline_user import user_support_finl, products_open_finl, p
 from tgbot.keyboards.inline_z_all import profile_open_inl
 from tgbot.keyboards.inline_z_page import *
 from tgbot.keyboards.reply_z_all import menu_frep
-from tgbot.loader import dp
+from tgbot.loader import dp, bot
 from tgbot.services.api_sqlite import *
 from tgbot.utils.const_functions import get_date, split_messages, get_unix
 from tgbot.utils.misc_functions import open_profile_my, upload_text, get_faq
@@ -32,7 +32,8 @@ async def user_shop(message: Message, state: FSMContext):
 async def user_profile(message: Message, state: FSMContext):
     await state.finish()
 
-    await message.answer(open_profile_my(message.from_user.id), reply_markup=profile_open_inl)
+    me = await bot.get_me()
+    await message.answer(open_profile_my(message.from_user.id, me), reply_markup=profile_open_inl)
 
 
 # Открытие FAQ

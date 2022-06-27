@@ -7,6 +7,7 @@ read_config.read('settings.ini')
 BOT_TOKEN = read_config['settings']['token'].strip()  # Токен бота
 DATABASE_PATH = 'tgbot/data/database.db'  # Путь к БД
 PATH_LOGS = 'tgbot/data/logs.log'  # Путь к Логам
+PERCENT = read_config['settings']['percent']
 
 
 # Получение администраторов бота

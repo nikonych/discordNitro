@@ -12,13 +12,21 @@ ad_confirm_inl = InlineKeyboardMarkup(
 profile_open_inl = InlineKeyboardMarkup(
 ).add(
     InlineKeyboardButton("💰 Пополнить", callback_data="user_refill"),
-    InlineKeyboardButton("🎁 Мои покупки", callback_data="user_history")
+    InlineKeyboardButton("🎁 Мои покупки", callback_data="user_history"),
+    InlineKeyboardButton("🤑 Реферальная система", callback_data="user_referer")
 )
 
 # Удаление сообщения
 close_inl = InlineKeyboardMarkup(
 ).add(
     InlineKeyboardButton("❌ Закрыть", callback_data="close_this"),
+)
+
+
+close_referer = InlineKeyboardMarkup(
+
+).add(
+    InlineKeyboardButton("⬅ Вернуться ↩", callback_data="user_profile")
 )
 
 ######################################## ТОВАРЫ ########################################

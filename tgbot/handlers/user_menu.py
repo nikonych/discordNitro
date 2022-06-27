@@ -1,12 +1,14 @@
 # - *- coding: utf- 8 - *-
 import asyncio
+from typing import Union
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
+from tgbot.data import config
 from tgbot.data.config import bot_description
 from tgbot.keyboards.inline_user import user_support_finl, products_open_finl, products_confirm_finl
-from tgbot.keyboards.inline_z_all import profile_open_inl
+from tgbot.keyboards.inline_z_all import profile_open_inl, close_inl, close_referer
 from tgbot.keyboards.inline_z_page import *
 from tgbot.keyboards.reply_z_all import menu_frep
 from tgbot.loader import dp, bot
@@ -93,10 +95,27 @@ async def user_history(call: CallbackQuery, state: FSMContext):
 
 # Возвращение к профилю
 @dp.callback_query_handler(text="user_profile", state="*")
-async def user_profile_return(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text(open_profile_my(call.from_user.id), reply_markup=profile_open_inl)
+async def user_profile_return(message: Union['Message', 'CallbackQuery'] , state: FSMContext):
+    me = await bot.get_me()
+    await message.message.edit_text(open_profile_my(message.from_user.id, me), reply_markup=profile_open_inl)
 
 
+# Referer system
+@dp.callback_query_handler(text="user_referer")
+async def user_referer(call: CallbackQuery ,state: FSMContext):
+    percent = config.PERCENT
+    me = await bot.get_me()
+    user_id = call.from_user.id
+    link = 'https://t.me/' + me.username + '?start=' + str(user_id)
+    count = len(referer_count(user_id))
+    await call.message.edit_text(
+        f'Реф ссылка: <code>{link}</code>\n'
+        f'Колл-во рефералов: {count}'
+        '\n\n'
+        'Информация:\n'
+        f'🤑 При покупке реферала вы получите {percent}% от покупки!\n',
+        reply_markup=close_referer
+    )
 ################################################################################################
 ######################################### ПОКУПКА ТОВАРА #######################################
 ########################################### КАТЕГОРИИ ##########################################

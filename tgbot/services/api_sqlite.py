@@ -88,6 +88,12 @@ def get_all_users_id():
         sql = "SELECT user_id FROM storage_users"
         return con.execute(sql).fetchall()
 
+# referer count
+def referer_count(user_id):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = lambda cursor, row: row[0]
+        sql = f"SELECT user_id FROM storage_users where `user_referer` = {user_id}"
+        return con.execute(sql).fetchall()
 
 
 # Редактирование пользователя

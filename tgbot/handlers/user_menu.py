@@ -375,6 +375,14 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                                           f"🎁 Товар: <code>{get_position['position_name']} | {get_count}шт | {amount_pay}₽</code>\n"
                                           f"🕰 Дата покупки: <code>{buy_time}</code>",
                                           reply_markup=menu_frep(call.from_user.id))
+
+                if int(has_referer(user_id=call.from_user.id)) != 0 and int(has_referer(user_id=call.from_user.id)) in get_all_users_id():
+                    balance = get_balance(has_referer(user_id=call.from_user.id))
+                    balance += int(int(amount_pay) * int(config.PERCENT) * 0.01)
+                    update_userx(user_id=int(has_referer(user_id=call.from_user.id)), user_balance=balance)
+                    await bot.send_message(int(has_referer(user_id=call.from_user.id)), f"От вашего реферала вам поступило: <code>{int(int(amount_pay) * int(config.PERCENT) * 0.01)}₽</code>!")
+
+
             else:
                 await call.message.answer("<b>❗ На вашем счёте недостаточно средств</b>")
         else:

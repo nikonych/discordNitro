@@ -96,6 +96,18 @@ def referer_count(user_id):
         return con.execute(sql).fetchall()
 
 
+def has_referer(user_id):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = f"SELECT user_referer FROM storage_users where `user_id` = {user_id}"
+        return con.execute(sql).fetchall()[0]['user_referer']
+
+def get_balance(user_id):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = f"SELECT user_balance FROM storage_users where `user_id` = {user_id}"
+        return con.execute(sql).fetchall()[0]['user_balance']
+
 # Редактирование пользователя
 def update_userx(user_id, **kwargs):
     with sqlite3.connect(DATABASE_PATH) as con:

@@ -1,7 +1,7 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton as ikb
 
-from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx
+from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx, get_crystal
 
 
 # Поиск профиля
@@ -25,6 +25,9 @@ def payment_choice_finl():
     keyboard = InlineKeyboardMarkup()
     get_payments = get_paymentx()
 
+    crystal_info = get_crystal()
+    print(crystal_info)
+
     if get_payments['way_form'] == "True":
         status_form_kb = ikb("✅", callback_data="change_payment:Form:False")
     else:
@@ -40,9 +43,15 @@ def payment_choice_finl():
     else:
         status_nickname_kb = ikb("❌", callback_data="change_payment:Nickname:True")
 
+    if crystal_info['status'] == 1:
+        status_crystal_kb = ikb("✅", callback_data="change_payment:Crystal:False")
+    else:
+        status_crystal_kb = ikb("❌", callback_data="change_payment:Crystal:True")
+
     keyboard.add(ikb("📋 По форме", url="https://vk.cc/bYjKGM"), status_form_kb)
     keyboard.add(ikb("📞 По номеру", url="https://vk.cc/bYjKEy"), status_number_kb)
     keyboard.add(ikb("Ⓜ По никнейму", url="https://vk.cc/c8s66X"), status_nickname_kb)
+    keyboard.add(ikb("💎 Crystal", url="https://vk.cc/c8s66X"), status_crystal_kb)
 
     return keyboard
 

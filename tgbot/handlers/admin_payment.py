@@ -3,12 +3,13 @@ import asyncio
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
+from pycrystalpay import CrystalPay
 
 from tgbot.keyboards.inline_admin import payment_choice_finl
 from tgbot.loader import dp
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
-from tgbot.services.api_sqlite import update_paymentx, get_paymentx
+from tgbot.services.api_sqlite import update_paymentx, get_paymentx, update_crystal, get_crystal
 from tgbot.utils.misc.bot_filters import IsAdmin
 
 
@@ -28,26 +29,42 @@ async def payment_systems_edit(call: CallbackQuery):
     way_pay = call.data.split(":")[1]
     way_status = call.data.split(":")[2]
 
-    get_payment = get_paymentx()
-
-    if get_payment['qiwi_login'] != "None" and get_payment['qiwi_token'] != "None" or way_status == "False":
-        if way_pay == "Form":
-            if get_payment['qiwi_secret'] != "None" or way_status == "False":
-                update_paymentx(way_form=way_status)
+    print(way_status)
+    if way_pay == 'Crystal':
+        crystal_info = get_crystal()
+        try:
+            crystal = CrystalPay(crystal_info['login'], crystal_info['secret'])
+            if way_status == 'False':
+                print("gg")
+                update_crystal(status=0)
             else:
-                await call.answer(
-                    "❗ Приватный ключ отсутствует. Измените киви и добавьте приватный ключ для включения оплаты по Форме",
-                    True)
-        elif way_pay == "Number":
-            update_paymentx(way_number=way_status)
-        elif way_pay == "Nickname":
-            status, response = await (await QiwiAPI(call)).get_nickname()
-            if status:
-                update_paymentx(way_nickname=way_status, qiwi_nickname=response)
-            else:
-                await call.answer(response, True)
+                print("ff")
+                update_crystal(status=1)
+        except:
+            await call.answer("❗ Добавьте Crystal перед включением Способов пополнений.", True)
     else:
-        await call.answer("❗ Добавьте киви кошелёк перед включением Способов пополнений.", True)
+
+
+        get_payment = get_paymentx()
+
+        if get_payment['qiwi_login'] != "None" and get_payment['qiwi_token'] != "None" or way_status == "False":
+            if way_pay == "Form":
+                if get_payment['qiwi_secret'] != "None" or way_status == "False":
+                    update_paymentx(way_form=way_status)
+                else:
+                    await call.answer(
+                        "❗ Приватный ключ отсутствует. Измените киви и добавьте приватный ключ для включения оплаты по Форме",
+                        True)
+            elif way_pay == "Number":
+                update_paymentx(way_number=way_status)
+            elif way_pay == "Nickname":
+                status, response = await (await QiwiAPI(call)).get_nickname()
+                if status:
+                    update_paymentx(way_nickname=way_status, qiwi_nickname=response)
+                else:
+                    await call.answer(response, True)
+        else:
+            await call.answer("❗ Добавьте киви кошелёк перед включением Способов пополнений.", True)
 
     try:
         await call.message.edit_text("<b>🖲 Выберите способ пополнения</b>", reply_markup=payment_choice_finl())

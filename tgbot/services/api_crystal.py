@@ -44,7 +44,7 @@ class CrystalAPI(AsyncClass):
         elif self.add_pass:
             try:
                 test_crystal = CrystalPay(self.login, self.secret)
-                update_crystal(login=self.login, secret=self.secret)
+                update_crystal(login=self.login, secret=self.secret, status=True)
                 await self.dp.answer("<b>💎 Crystal был успешно изменён</b>")
             except:
                 await self.dp.answer("<b>💎 Crystal данные не прошли проверку</b>")

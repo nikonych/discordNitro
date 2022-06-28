@@ -139,8 +139,8 @@ async def payment_qiwi_edit_secret(message: Message, state: FSMContext):
 async def payment_crystal_edit(message: Message, state: FSMContext):
     await state.finish()
 
-    await state.set_state("here_qiwi_login")
-    await message.answer("<b>🥝 Введите <code>номер (через +7, +380)</code> QIWI кошелька</b>")
+    await state.set_state("here_crystal_login")
+    await message.answer("<b>💎 Введите <code>логин</code> Crystal</b>")
 
 
 # Проверка работоспособности CRYSTAL
@@ -156,5 +156,29 @@ async def payment_crystal_check(message: Message, state: FSMContext):
 async def payment_crystal_balance(message: Message, state: FSMContext):
     await state.finish()
 
-    await (await QiwiAPI(message)).get_balance()
+    await (await CrystalAPI(message)).get_balance()
 
+
+# Принятие логина для QIWI
+@dp.message_handler(IsAdmin(), state="here_crystal_login")
+async def payment_crystal_edit_login(message: Message, state: FSMContext):
+    await state.update_data(here_crystal_login=message.text)
+
+    await state.set_state("here_crystal_secret")
+    await message.answer(
+        "<b>💎 Введите <code>Секретный ключ</code></b>\n"
+    )
+
+@dp.message_handler(IsAdmin(), state="here_crystal_secret")
+async def payment_crystal_edit_secret(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        crystal_login = data['here_crystal_login']
+        if message.text == "0": crystal_secret = "None"
+        if message.text != "0": crystal_secret = message.text
+
+    await state.finish()
+
+    cache_message = await message.answer("<b>🔄 Проверка введённых Crystal данных...</b>")
+    await asyncio.sleep(0.5)
+
+    await (await CrystalAPI(message, login=crystal_login, secret=crystal_secret, add_pass=True)).pre_checker()

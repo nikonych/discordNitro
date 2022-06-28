@@ -1,3 +1,2 @@
-ERROR | 2022-06-28 11:30:56,653 | main.py:40 | BOT WAS STARTED
+ERROR | 2022-06-28 15:34:31,022 | main.py:40 | BOT WAS STARTED
 NoneType: None
-WARNING | 2022-06-28 11:32:49,188 | executor.py:329 | Goodbye!

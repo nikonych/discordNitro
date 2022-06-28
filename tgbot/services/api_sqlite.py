@@ -155,6 +155,15 @@ def update_paymentx(**kwargs):
         con.commit()
 
 
+def update_crystal(**kwargs):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = "UPDATE storage_crystal SET"
+        sql, parameters = update_format(sql, kwargs)
+        con.execute(sql, parameters)
+        con.commit()
+
+
 # Получение настроек
 def get_settingsx():
     with sqlite3.connect(DATABASE_PATH) as con:

@@ -21,6 +21,7 @@ def menu_frep(user_id):
 def payments_frep():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row("🥝 Изменить QIWI", "🥝 Проверить QIWI", "🥝 Баланс QIWI")
+    keyboard.row("💎 Изменить Crystal", "💎 Проверить Crystal", "💎 Баланс Crystal")
     keyboard.row("⬅ Главное меню", "🖲 Способы пополнения")
 
     return keyboard

@@ -6,6 +6,7 @@ from aiogram.types import CallbackQuery, Message
 
 from tgbot.keyboards.inline_admin import payment_choice_finl
 from tgbot.loader import dp
+from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
 from tgbot.services.api_sqlite import update_paymentx, get_paymentx
 from tgbot.utils.misc.bot_filters import IsAdmin
@@ -129,3 +130,31 @@ async def payment_qiwi_edit_secret(message: Message, state: FSMContext):
     await asyncio.sleep(0.5)
 
     await (await QiwiAPI(cache_message, qiwi_login, qiwi_token, qiwi_secret, True)).pre_checker()
+
+
+###################################################################################
+####################################### CRYSTAL ###################################
+# Изменение CRYSTAL кошелька
+@dp.message_handler(IsAdmin(), text="💎 Изменить Crystal", state="*")
+async def payment_crystal_edit(message: Message, state: FSMContext):
+    await state.finish()
+
+    await state.set_state("here_qiwi_login")
+    await message.answer("<b>🥝 Введите <code>номер (через +7, +380)</code> QIWI кошелька</b>")
+
+
+# Проверка работоспособности CRYSTAL
+@dp.message_handler(IsAdmin(), text="💎 Проверить Crystal", state="*")
+async def payment_crystal_check(message: Message, state: FSMContext):
+    await state.finish()
+
+    await (await CrystalAPI(message, check_pass=True)).pre_checker()
+
+
+# Баланс CRYSTAL
+@dp.message_handler(IsAdmin(), text="💎 Баланс Crystal", state="*")
+async def payment_crystal_balance(message: Message, state: FSMContext):
+    await state.finish()
+
+    await (await QiwiAPI(message)).get_balance()
+

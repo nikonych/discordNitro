@@ -644,12 +644,13 @@ def create_dbx():
                         "balance_after INTEGER)")
             print("DB was not found(8/9) | Creating...")
 
-        if len(con.execute("PRAGMA table_info(storage_crystal)").fetchall()) == 2:
+        if len(con.execute("PRAGMA table_info(storage_crystal)").fetchall()) == 3:
             print("DB was found(9/9)")
         else:
             con.execute("create table storage_crystal("
                         "login  TEXT,"
-                        "secret TEXT)")
+                        "secret TEXT,"
+                        "status boolean)")
             print("DB was not found(9/9) | Creating...")
 
         con.commit()

@@ -1,11 +1,13 @@
 # - *- coding: utf- 8 - *-
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
+from pycrystalpay import CrystalPay
 
 from tgbot.keyboards.inline_user import refill_bill_finl, refill_choice_finl
 from tgbot.loader import dp
+from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
-from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, get_userx
+from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, get_userx, get_crystal
 from tgbot.utils.const_functions import get_date, get_unix
 from tgbot.utils.misc_functions import send_admins
 
@@ -47,13 +49,21 @@ async def refill_get(message: Message, state: FSMContext):
         if min_input_qiwi <= pay_amount <= 300000:
             get_way = (await state.get_data())['here_pay_way']
             await state.finish()
-
-            get_message, get_link, receipt = await (
-                await QiwiAPI(cache_message, user_bill_pass=True)
-            ).bill_pay(pay_amount, get_way)
+            if get_way == 'Crystal':
+                get_payment, get_message = await (
+                    await CrystalAPI(cache_message)
+                ).bill_pay(pay_amount)
+            else:
+                get_message, get_link, receipt = await (
+                    await QiwiAPI(cache_message, user_bill_pass=True)
+                ).bill_pay(pay_amount, get_way)
 
             if get_message:
-                await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(get_link, receipt, get_way))
+                if get_way == 'Crystal':
+                    print(get_payment.id)
+                    await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(get_payment.url, get_payment.id, get_way))
+                else:
+                    await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(get_link, receipt, get_way))
         else:
             await cache_message.edit_text(f"<b>❌ Неверная сумма пополнения</b>\n"
                                           f"▶ Cумма не должна быть меньше <code>{min_input_qiwi}₽</code> и больше <code>300 000₽</code>\n"
@@ -112,6 +122,29 @@ async def refill_check_send(call: CallbackQuery):
             await refill_success(call, receipt, pay_amount, way_pay)
         else:
             await call.answer("❗ Ваше пополнение уже зачислено.", True, cache_time=60)
+
+
+@dp.callback_query_handler(text_startswith="Pay:Crystal")
+async def refill_check_form(call: CallbackQuery):
+    receipt = call.data.split(":")[2]
+
+    crystal_info = get_crystal()
+    crystal = CrystalPay(crystal_info['login'], crystal_info['secret'])
+    payment = crystal.construct_payment_by_id(receipt)
+
+    print(payment.url)
+    isPaid = payment.if_paid()
+
+    if isPaid:
+        get_refill = get_refillx(refill_receipt=receipt)
+        if get_refill is None:
+            await refill_success(call, receipt, payment.amount, "Crystal")
+        else:
+            await call.answer("❗ Ваше пополнение уже было зачислено.", True)
+    else:
+        await call.answer("❗ Платёж не был найден.\n"
+                          "⌛ Попробуйте чуть позже.", True, cache_time=5)
+
 
 
 ##########################################################################################

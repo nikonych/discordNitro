@@ -66,4 +66,18 @@ class CrystalAPI(AsyncClass):
                                  f"{save_balance}")
 
 
+    # Создание платежа
+    async def bill_pay(self, get_amount):
+        response = await self.pre_checker()
+        if response:
+            crystal = CrystalPay(self.login, self.secret)
+            payment = crystal.create_invoice(get_amount)
+            send_requests = payment.url
+            return_message = f"<b>🆙 Пополнение баланса</b>\n" \
+                             f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+                             f"💎 Для пополнения баланса, нажмите на кнопку ниже \n<code>Перейти к оплате</code> и оплатите выставленный вам счёт\n" \
+                             f"💰 Сумма пополнения: <code>{get_amount}₽</code>\n" \
+                             f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+                             f"🔄 После оплаты, нажмите на <code>Проверить оплату</code>"
+            return payment, return_message
 

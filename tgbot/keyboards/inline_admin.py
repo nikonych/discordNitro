@@ -1,7 +1,7 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton as ikb
 
-from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx, get_crystal
+from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx, get_crystal, get_wm
 
 
 # Поиск профиля
@@ -26,7 +26,7 @@ def payment_choice_finl():
     get_payments = get_paymentx()
 
     crystal_info = get_crystal()
-    print(crystal_info)
+    wm_info = get_wm()
 
     if get_payments['way_form'] == "True":
         status_form_kb = ikb("✅", callback_data="change_payment:Form:False")
@@ -48,10 +48,16 @@ def payment_choice_finl():
     else:
         status_crystal_kb = ikb("❌", callback_data="change_payment:Crystal:True")
 
+    if wm_info['status'] == 1:
+        status_wm_kb = ikb("✅", callback_data="change_payment:WebMoney:False")
+    else:
+        status_wm_kb = ikb("❌", callback_data="change_payment:WebMoney:True")
+
     keyboard.add(ikb("📋 По форме", url="https://vk.cc/bYjKGM"), status_form_kb)
     keyboard.add(ikb("📞 По номеру", url="https://vk.cc/bYjKEy"), status_number_kb)
     keyboard.add(ikb("Ⓜ По никнейму", url="https://vk.cc/c8s66X"), status_nickname_kb)
     keyboard.add(ikb("💎 Crystal", url="https://vk.cc/c8s66X"), status_crystal_kb)
+    keyboard.add(ikb("🌍 WebMoney", url="https://vk.cc/c8s66X"), status_wm_kb)
 
     return keyboard
 

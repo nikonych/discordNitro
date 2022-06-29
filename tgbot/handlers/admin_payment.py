@@ -1,6 +1,7 @@
 # - *- coding: utf- 8 - *-
 import asyncio
 
+from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from pycrystalpay import CrystalPay
@@ -9,7 +10,8 @@ from tgbot.keyboards.inline_admin import payment_choice_finl
 from tgbot.loader import dp
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
-from tgbot.services.api_sqlite import update_paymentx, get_paymentx, update_crystal, get_crystal
+from tgbot.services.api_sqlite import update_paymentx, get_paymentx, update_crystal, get_crystal, update_wm
+from tgbot.services.api_wm import wmAPI
 from tgbot.utils.misc.bot_filters import IsAdmin
 
 
@@ -29,21 +31,25 @@ async def payment_systems_edit(call: CallbackQuery):
     way_pay = call.data.split(":")[1]
     way_status = call.data.split(":")[2]
 
-    print(way_status)
     if way_pay == 'Crystal':
         crystal_info = get_crystal()
         try:
             crystal = CrystalPay(crystal_info['login'], crystal_info['secret'])
             if way_status == 'False':
-                print("gg")
                 update_crystal(status=0)
             else:
-                print("ff")
                 update_crystal(status=1)
         except:
             await call.answer("❗ Добавьте Crystal перед включением Способов пополнений.", True)
+    elif way_pay == 'WebMoney':
+        try:
+            if way_status == 'False':
+                update_wm(status=0)
+            else:
+                update_wm(status=1)
+        except:
+            await call.answer("❗ Добавьте WebMoney перед включением Способов пополнений.", True)
     else:
-
 
         get_payment = get_paymentx()
 
@@ -186,6 +192,7 @@ async def payment_crystal_edit_login(message: Message, state: FSMContext):
         "<b>💎 Введите <code>Секретный ключ</code></b>\n"
     )
 
+
 @dp.message_handler(IsAdmin(), state="here_crystal_secret")
 async def payment_crystal_edit_secret(message: Message, state: FSMContext):
     async with state.proxy() as data:
@@ -199,3 +206,61 @@ async def payment_crystal_edit_secret(message: Message, state: FSMContext):
     await asyncio.sleep(0.5)
 
     await (await CrystalAPI(message, login=crystal_login, secret=crystal_secret, add_pass=True)).pre_checker()
+
+
+###################################################################################
+####################################### WebMoney ##################################
+# Изменение WebMoney кошелька
+@dp.message_handler(IsAdmin(), text="🌍 Изменить WebMoney", state="*")
+async def payment_crystal_edit(message: Message, state: FSMContext):
+    await state.finish()
+
+    await state.set_state("here_wm_wallet")
+    await message.answer("<b>🌍 Введите <code>wallet</code> WebMoney</b>")
+
+
+# Проверка работоспособности WebMoney
+@dp.message_handler(IsAdmin(), text="🌍 Проверить WebMoney", state="*")
+async def payment_crystal_check(message: Message, state: FSMContext):
+    await state.finish()
+
+    await (await wmAPI(message, check_pass=True)).pre_checker()
+
+
+@dp.message_handler(IsAdmin(), state="here_wm_wallet")
+async def payment_wm_edit_wallet(message: Message, state: FSMContext):
+    await state.update_data(here_wm_wallet=message.text)
+
+    await state.set_state("here_wm_crt")
+    await message.answer(
+        "<b>🌍 Отправьте <code>CRT сертификат</code> (разрешением .pem)</b>\n"
+    )
+
+
+@dp.message_handler(IsAdmin(), state="here_wm_crt")
+async def payment_wm_edit_crt(message: Message, state: FSMContext):
+    print("ff")
+    print(message.document.file_id)
+    await state.update_data(here_wm_crt=message.document.file_id)
+
+    await state.set_state("here_wm_key")
+    await message.answer(
+        "<b>🌍 Отправьте <code>KEY сертификат</code> (разрешением .pem)</b>\n"
+    )
+
+
+@dp.message_handler(IsAdmin(), state="here_wm_key")
+async def payment_wm_edit_key(message: Message, state: FSMContext):
+    print("gg")
+    async with state.proxy() as data:
+        wm_wallet = data['here_wm_wallet']
+        wm_crt = data['here_wm_crt']
+        wm_key = message.document
+
+
+    await state.finish()
+
+    cache_message = await message.answer("<b>🔄 Проверка введённых данных...</b>")
+    await asyncio.sleep(0.5)
+
+    await (await wmAPI(cache_message, wallet=wm_wallet, crt=wm_crt, key=wm_key, add_pass=True)).pre_checker()

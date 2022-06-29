@@ -1,30 +1,13 @@
-from pycrystalpay import CrystalPay
+from paymentcheckout import WebMoneyCheck
 
-# crystal = CrystalPay('nikon','fbee2cde41713ada4c07bfbdf3909b02b8bcf624')
+#WEBMONEY CONFIG
+WEBMONEY_WALLET = "R123456789000" # EXAMPLE
+CRT_PATH = "/home/name/crt.pem" # EXAMPLE PATH TO CRT
+KEY_PATH = "/home/name/key.pem" # EXAMPLE PATH TO KEY
+#WEBMONEY PAY CHECK
+WM_PAY_SUM = '1000'
+WM_PAY_COMMENT = 'None'
 
-
-def pre_checker(login, secret):
-    if login != "None" and secret != "None":
-        try:
-            crystal = CrystalPay(login, secret)
-            return True
-        except:
-            return False
-
-print(pre_checker('nikon','fbee2cde41713ada4c07bfbdf3909b02b8bcf624'))
-# balance = crystal.get_cash_balance()
-# print(balance)
-#
-# print(crystal)
-#
-# payment = crystal.create_invoice(100)
-# print(payment.url) #Ссылка на оплату
-# print(payment.amount) # Сумма к оплате
-# print(payment.id) #id оплаты
-#
-# if payment.if_paid():
-#     print(payment.paymethod) # Метод, которым была произведена оплата. "btc", "qiwi"
-#     # Оплата была произведена
-# else:
-#     # Счет не оплачен
-#     print(payment.paymethod)
+w = WebMoneyCheck.WebMoney(WEBMONEY_WALLET, CRT_PATH, KEY_PATH)
+r = w.result_pay(WM_PAY_SUM, WM_PAY_COMMENT)
+print(r)

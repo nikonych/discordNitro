@@ -150,6 +150,12 @@ def get_crystal():
         sql = "SELECT * FROM storage_crystal"
         return con.execute(sql).fetchone()
 
+def get_wm():
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = "SELECT * FROM storage_wm"
+        return con.execute(sql).fetchone()
+
 
 # Редактирование платежных систем
 def update_paymentx(**kwargs):
@@ -165,6 +171,14 @@ def update_crystal(**kwargs):
     with sqlite3.connect(DATABASE_PATH) as con:
         con.row_factory = dict_factory
         sql = "UPDATE storage_crystal SET"
+        sql, parameters = update_format(sql, kwargs)
+        con.execute(sql, parameters)
+        con.commit()
+
+def update_wm(**kwargs):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = "UPDATE storage_wm SET"
         sql, parameters = update_format(sql, kwargs)
         con.execute(sql, parameters)
         con.commit()

@@ -1,7 +1,7 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from tgbot.services.api_sqlite import get_paymentx, get_crystal
+from tgbot.services.api_sqlite import get_paymentx, get_crystal, get_wm
 
 
 # Выбор способов пополнения
@@ -10,6 +10,7 @@ def refill_choice_finl():
 
     get_payments = get_paymentx()
     crystal = get_crystal()
+    wm = get_wm()
     active_kb = []
 
     if get_payments['way_form'] == "True":
@@ -22,6 +23,14 @@ def refill_choice_finl():
     if crystal['status'] == True:
         active_kb.append(InlineKeyboardButton("💎 Crystal", callback_data="refill_choice:Crystal"))
 
+    if wm['status'] == True:
+        active_kb.append(InlineKeyboardButton("🌍 WebMoney", callback_data="refill_choice:WebMoney"))
+
+
+    if len(active_kb) == 5:
+        keyboard.add(active_kb[0], active_kb[1])
+        keyboard.add(active_kb[2], active_kb[3])
+        keyboard.add(active_kb[4])
     if len(active_kb) == 4:
         keyboard.add(active_kb[0], active_kb[1])
         keyboard.add(active_kb[2], active_kb[3])

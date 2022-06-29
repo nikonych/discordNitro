@@ -10,7 +10,7 @@ from tgbot.keyboards.reply_z_all import menu_frep
 from tgbot.loader import bot
 from tgbot.services.api_sqlite import get_settingsx, update_settingsx, get_userx, get_purchasesx, get_all_positionsx, \
     update_positionx, get_all_categoriesx, get_all_purchasesx, get_all_refillx, get_all_usersx, get_all_itemsx, \
-    get_itemsx, get_positionx, get_categoryx
+    get_itemsx, get_positionx, get_categoryx, referer_count
 from tgbot.utils.const_functions import get_unix, convert_day
 
 # bot created by @djimbox
@@ -170,13 +170,18 @@ def open_profile_my(user_id, me):
         for items in get_purchases:
             count_items += int(items['purchase_count'])
     link = 'https://t.me/' + me.username + '?start=' + str(user_id)
+    count = len(referer_count(user_id))
     return f"<b>👮‍♀️ Ваш профиль:</b>\n" \
            f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
            f"🆔 ID: <code>{get_user['user_id']}</code>\n" \
            f"💰 Баланс: <code>{get_user['user_balance']}₽</code>\n" \
            f"🎁 Куплено товаров: <code>{count_items}шт</code>\n" \
            f"🕰 Регистрация: <code>{get_user['user_date'].split(' ')[0]} ({convert_day(how_days)})</code>\n" \
-           f"👪 Реферальная ссылка:  <code>{link}</code>"
+           f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+           f"👑 Заработано с рефералов: <code>{get_user['user_referer_balance']}₽</code>\n" \
+           f"🤍 Количество рефералов: <code>{count}</code>\n" \
+           f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+           f"💵 Всего пополнено: <code>{get_user['user_refill']}₽</code>\n" \
 
 
 # Открытие профиля при поиске

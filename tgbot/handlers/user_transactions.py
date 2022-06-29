@@ -9,7 +9,7 @@ from tgbot.loader import dp, bot
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
 from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, get_userx, get_crystal, has_referer, \
-    get_all_users_id, get_balance
+    get_all_users_id, get_balance, get_ref_balance
 from tgbot.utils.const_functions import get_date, get_unix
 from tgbot.utils.misc_functions import send_admins
 
@@ -175,7 +175,11 @@ async def refill_success(call: CallbackQuery, receipt, amount, get_way):
     if int(has_referer(user_id=call.from_user.id)) != 0 and int(
             has_referer(user_id=call.from_user.id)) in get_all_users_id():
         balance = get_balance(has_referer(user_id=call.from_user.id))
+        ref_balance = get_ref_balance(has_referer(user_id=call.from_user.id))
+        print(ref_balance)
+        ref_balance += int(int(amount) * int(config.PERCENT) * 0.01)
         balance += int(int(amount) * int(config.PERCENT) * 0.01)
-        update_userx(user_id=int(has_referer(user_id=call.from_user.id)), user_balance=balance)
+        update_userx(user_id=int(has_referer(user_id=call.from_user.id)), user_balance=balance, user_referer_balance=ref_balance)
+
         await bot.send_message(int(has_referer(user_id=call.from_user.id)),
                                f"От вашего реферала вам поступило: <code>{int(int(amount) * int(config.PERCENT) * 0.01)}₽</code>!")

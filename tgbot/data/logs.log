@@ -1,3 +1,28 @@
-ERROR | 2022-06-29 09:10:40,434 | main.py:40 | BOT WAS STARTED
+ERROR | 2022-06-29 10:09:39,108 | main.py:40 | BOT WAS STARTED
 NoneType: None
-WARNING | 2022-06-29 09:12:55,168 | executor.py:329 | Goodbye!
+ERROR | 2022-06-29 10:10:48,006 | z_all_errors.py:63 | Exception: open_profile_my() missing 1 required positional argument: 'me'
+Update: {"update_id":565301922,"callback_query":{"id":"4134613428804423807","from":{"id":962664705,"is_bot":false,"first_name":"Heisenbergᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧᅠᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧ","username":"nniIkon","language_code":"en"},"message":{"message_id":2365,"from":{"id":1630251130,"is_bot":true,"first_name":"fucknow","username":"ganslohbot"},"chat":{"id":962664705,"first_name":"Heisenbergᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧᅠᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧ","username":"nniIkon","type":"private"},"date":1656475834,"text":"👮‍♀️ Ваш профиль:\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n🆔 ID: 962664705\n💰 Баланс: 6833₽\n🎁 Куплено товаров: 2шт\n🕰 Регистрация: 27.06.2022 (2 дня)\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n👑 Заработано с рефералов: 100₽\n🤍 Количество рефералов: 1\n➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n💵 Всего пополнено: 1654₽","entities":[{"type":"bold","offset":0,"length":18},{"type":"code","offset":45,"length":9},{"type":"code","offset":66,"length":5},{"type":"code","offset":92,"length":3},{"type":"code","offset":112,"length":18},{"type":"code","offset":177,"length":4},{"type":"code","offset":207,"length":1},{"type":"code","offset":248,"length":5}],"reply_markup":{"inline_keyboard":[[{"text":"💰 Пополнить","callback_data":"user_refill"},{"text":"🎁 Мои покупки","callback_data":"user_history"}],[{"text":"🤑 Реферальная система","callback_data":"user_referer"}]]}},"chat_instance":"7582974048481942904","data":"user_history"}}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 283, in process_update
+    return await self.callback_query_handlers.notify(update.callback_query)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/handler.py", line 116, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "/home/niko/Documents/autoshopDjimbo3.0/tgbot/handlers/user_menu.py", line 92, in user_history
+    await call.message.answer(open_profile_my(call.from_user.id), reply_markup=profile_open_inl)
+TypeError: open_profile_my() missing 1 required positional argument: 'me'
+ERROR | 2022-06-29 10:10:48,007 | executor.py:323 | Task exception was never retrieved
+future: <Task finished name='Task-50' coro=<Dispatcher._process_polling_updates() done, defined at /usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py:407> exception=TypeError("open_profile_my() missing 1 required positional argument: 'me'")>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/handler.py", line 116, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 283, in process_update
+    return await self.callback_query_handlers.notify(update.callback_query)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/handler.py", line 116, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "/home/niko/Documents/autoshopDjimbo3.0/tgbot/handlers/user_menu.py", line 92, in user_history
+    await call.message.answer(open_profile_my(call.from_user.id), reply_markup=profile_open_inl)
+TypeError: open_profile_my() missing 1 required positional argument: 'me'

@@ -13,8 +13,12 @@ profile_open_inl = InlineKeyboardMarkup(
 ).add(
     InlineKeyboardButton("💰 Пополнить", callback_data="user_refill"),
     InlineKeyboardButton("🎁 Мои покупки", callback_data="user_history"),
+
+)
+profile_open_inl.add(
     InlineKeyboardButton("🤑 Реферальная система", callback_data="user_referer")
 )
+
 
 # Удаление сообщения
 close_inl = InlineKeyboardMarkup(

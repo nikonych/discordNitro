@@ -2,6 +2,7 @@
 import asyncio
 from typing import Union
 
+import requests
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -107,14 +108,14 @@ async def user_referer(call: CallbackQuery ,state: FSMContext):
     me = await bot.get_me()
     user_id = call.from_user.id
     link = 'https://t.me/' + me.username + '?start=' + str(user_id)
-    count = len(referer_count(user_id))
-    await call.message.edit_text(
-        f'Реф ссылка: <code>{link}</code>\n'
-        f'Колл-во рефералов: {count}'
-        '\n\n'
-        'Информация:\n'
-        f'🤑 При покупке реферала вы получите {percent}% от покупки!\n',
-        reply_markup=close_referer
+    await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=
+        f'🤍 Реферальная система 🤍\n'
+        '\n'
+        '🔗<i> Ссылка: </i>\n'
+        f'<code>{link}</code>\n'
+        f'\n'
+        f'<i>📔 Наша реферальная система позволит вам заработать крупную сумму без вложений. Вам необходимо лишь давать свою ссылку друзьям и вы будете получать пожизненно {percent}% с их пополнений в боте</i>',
+        reply_markup=close_inl
     )
 ################################################################################################
 ######################################### ПОКУПКА ТОВАРА #######################################

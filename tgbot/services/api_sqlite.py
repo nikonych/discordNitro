@@ -108,6 +108,12 @@ def get_balance(user_id):
         sql = f"SELECT user_balance FROM storage_users where `user_id` = {user_id}"
         return con.execute(sql).fetchall()[0]['user_balance']
 
+def get_ref_balance(user_id):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = f"SELECT user_referer_balance FROM storage_users where `user_id` = {user_id}"
+        return con.execute(sql).fetchall()[0]['user_referer_balance']
+
 # Редактирование пользователя
 def update_userx(user_id, **kwargs):
     with sqlite3.connect(DATABASE_PATH) as con:
@@ -510,7 +516,7 @@ def create_dbx():
         con.row_factory = dict_factory
 
         # Создание БД с хранением данных пользователей
-        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 9:
+        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 10:
             print("DB was found(1/9)")
         else:
             con.execute("CREATE TABLE storage_users("
@@ -522,7 +528,8 @@ def create_dbx():
                         "user_refill INTEGER,"
                         "user_date TIMESTAMP,"
                         "user_unix INTEGER,"
-                        "user_referer INTEGER DEFAULT 0)")
+                        "user_referer INTEGER DEFAULT 0,"
+                        "user_referer_balance INTEGER DEFAULT 0)")
             print("DB was not found(1/9) | Creating...")
 
         # Создание БД с хранением данных платежных систем

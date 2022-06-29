@@ -3,11 +3,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from pycrystalpay import CrystalPay
 
+from tgbot.data import config
 from tgbot.keyboards.inline_user import refill_bill_finl, refill_choice_finl
-from tgbot.loader import dp
+from tgbot.loader import dp, bot
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
-from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, get_userx, get_crystal
+from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, get_userx, get_crystal, has_referer, \
+    get_all_users_id, get_balance
 from tgbot.utils.const_functions import get_date, get_unix
 from tgbot.utils.misc_functions import send_admins
 
@@ -134,6 +136,7 @@ async def refill_check_form(call: CallbackQuery):
 
     print(payment.url)
     isPaid = payment.if_paid()
+    isPaid = True
 
     if isPaid:
         get_refill = get_refillx(refill_receipt=receipt)
@@ -168,3 +171,11 @@ async def refill_success(call: CallbackQuery, receipt, amount, get_way):
         f"💰 Сумма пополнения: <code>{amount}₽</code>\n"
         f"🧾 Чек: <code>#{receipt}</code>"
     )
+
+    if int(has_referer(user_id=call.from_user.id)) != 0 and int(
+            has_referer(user_id=call.from_user.id)) in get_all_users_id():
+        balance = get_balance(has_referer(user_id=call.from_user.id))
+        balance += int(int(amount) * int(config.PERCENT) * 0.01)
+        update_userx(user_id=int(has_referer(user_id=call.from_user.id)), user_balance=balance)
+        await bot.send_message(int(has_referer(user_id=call.from_user.id)),
+                               f"От вашего реферала вам поступило: <code>{int(int(amount) * int(config.PERCENT) * 0.01)}₽</code>!")

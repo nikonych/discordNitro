@@ -539,7 +539,7 @@ def create_dbx():
 
         # Создание БД с хранением данных пользователей
         if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 10:
-            print("DB was found(1/9)")
+            print("DB was found(1/10)")
         else:
             con.execute("CREATE TABLE storage_users("
                         "increment INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -552,11 +552,11 @@ def create_dbx():
                         "user_unix INTEGER,"
                         "user_referer INTEGER DEFAULT 0,"
                         "user_referer_balance INTEGER DEFAULT 0)")
-            print("DB was not found(1/9) | Creating...")
+            print("DB was not found(1/10) | Creating...")
 
         # Создание БД с хранением данных платежных систем
         if len(con.execute("PRAGMA table_info(storage_payment)").fetchall()) == 7:
-            print("DB was found(2/9)")
+            print("DB was found(2/10)")
         else:
             con.execute("CREATE TABLE storage_payment("
                         "qiwi_login TEXT,"
@@ -571,11 +571,11 @@ def create_dbx():
                         "qiwi_login, qiwi_token, qiwi_secret, qiwi_nickname, way_form, way_number, way_nickname) "
                         "VALUES (?, ?, ?, ?, ?, ?, ?)",
                         ['None', 'None', 'None', 'None', 'False', 'False', 'False'])
-            print("DB was not found(2/9) | Creating...")
+            print("DB was not found(2/10) | Creating...")
 
         # Создание БД с хранением настроек
         if len(con.execute("PRAGMA table_info(storage_settings)").fetchall()) == 9:
-            print("DB was found(3/9)")
+            print("DB was found(3/10)")
         else:
             con.execute("CREATE TABLE storage_settings("
                         "status_work TEXT,"
@@ -592,11 +592,11 @@ def create_dbx():
                         "status_work, status_refill, status_buy, misc_faq, misc_support, misc_bot, misc_update, misc_profit_day, misc_profit_week)"
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         ["True", "False", "False", "None", "None", "None", "False", get_unix(), get_unix()])
-            print("DB was not found(3/9) | Creating...")
+            print("DB was not found(3/10) | Creating...")
 
         # Создание БД с хранением пополнений пользователей
         if len(con.execute("PRAGMA table_info(storage_refill)").fetchall()) == 10:
-            print("DB was found(4/9)")
+            print("DB was found(4/10)")
         else:
             con.execute("CREATE TABLE storage_refill("
                         "increment INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -609,21 +609,21 @@ def create_dbx():
                         "refill_way TEXT,"
                         "refill_date TIMESTAMP,"
                         "refill_unix INTEGER)")
-            print("DB was not found(4/9) | Creating...")
+            print("DB was not found(4/10) | Creating...")
 
         # Создание БД с хранением категорий
         if len(con.execute("PRAGMA table_info(storage_category)").fetchall()) == 3:
-            print("DB was found(5/9)")
+            print("DB was found(5/10)")
         else:
             con.execute("CREATE TABLE storage_category("
                         "increment INTEGER PRIMARY KEY AUTOINCREMENT,"
                         "category_id INTEGER,"
                         "category_name TEXT)")
-            print("DB was not found(5/9) | Creating...")
+            print("DB was not found(5/10) | Creating...")
 
         # Создание БД с хранением позиций
         if len(con.execute("PRAGMA table_info(storage_position)").fetchall()) == 8:
-            print("DB was found(6/9)")
+            print("DB was found(6/10)")
         else:
             con.execute("CREATE TABLE storage_position("
                         "increment INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -634,11 +634,11 @@ def create_dbx():
                         "position_photo TEXT,"
                         "position_date TIMESTAMP,"
                         "category_id INTEGER)")
-            print("DB was not found(6/9) | Creating...")
+            print("DB was not found(6/10) | Creating...")
 
         # Создание БД с хранением товаров
         if len(con.execute("PRAGMA table_info(storage_item)").fetchall()) == 8:
-            print("DB was found(7/9)")
+            print("DB was found(7/10)")
         else:
             con.execute("CREATE TABLE storage_item("
                         "increment INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -649,11 +649,11 @@ def create_dbx():
                         "creator_id INTEGER,"
                         "creator_name TEXT,"
                         "add_date TIMESTAMP)")
-            print("DB was not found(7/9) | Creating...")
+            print("DB was not found(7/10) | Creating...")
 
         # # Создание БД с хранением покупок
         if len(con.execute("PRAGMA table_info(storage_purchases)").fetchall()) == 15:
-            print("DB was found(8/9)")
+            print("DB was found(8/10)")
         else:
             con.execute("CREATE TABLE storage_purchases("
                         "increment INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -671,16 +671,26 @@ def create_dbx():
                         "purchase_unix INTEGER,"
                         "balance_before INTEGER,"
                         "balance_after INTEGER)")
-            print("DB was not found(8/9) | Creating...")
+            print("DB was not found(8/10) | Creating...")
 
         if len(con.execute("PRAGMA table_info(storage_crystal)").fetchall()) == 3:
-            print("DB was found(9/9)")
+            print("DB was found(9/10)")
         else:
             con.execute("create table storage_crystal("
                         "login  TEXT,"
                         "secret TEXT,"
                         "status boolean)")
-            print("DB was not found(9/9) | Creating...")
+            print("DB was not found(9/10) | Creating...")
+
+        if len(con.execute("PRAGMA table_info(storage_wm)").fetchall()) == 4:
+            print("DB was found(10/10)")
+        else:
+            con.execute("create table storage_wm("
+                        "wallet  TEXT,"
+                        "type TEXT,"
+                        "status boolean,"
+                        "balance INTEGER)")
+            print("DB was not found(10/10) | Creating...")
 
         con.commit()
 

@@ -181,3 +181,13 @@ def position_edit_clear_finl(position_id, category_id, remover):
     )
 
     return keyboard
+
+
+def check_wm(user_id,amount, message_id):
+    keyboard = InlineKeyboardMarkup(
+    ).add(
+        ikb("✅ Подтвердить", callback_data=f"check_wm:{user_id}:{amount}:True:{message_id}"),
+        ikb("❌ Отклонить", callback_data=f"check_wm:{user_id}:{amount}:False:{message_id}")
+    )
+
+    return keyboard

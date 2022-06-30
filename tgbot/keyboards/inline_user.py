@@ -62,6 +62,15 @@ def refill_bill_finl(send_requests, get_receipt, get_way):
     return keyboard
 
 
+def refill_bill_finl_wm(get_receipt, get_way):
+    keyboard = InlineKeyboardMarkup(
+    ).add(
+        InlineKeyboardButton("🔄 Проверить оплату", callback_data=f"Pay:{get_way}:{get_receipt}")
+    )
+
+    return keyboard
+
+
 
 # Кнопки при открытии самого товара
 def products_open_finl(position_id, remover, category_id):

@@ -227,35 +227,31 @@ async def payment_crystal_check(message: Message, state: FSMContext):
     await (await wmAPI(message, check_pass=True)).pre_checker()
 
 
+# Баланс WebMoney
+@dp.message_handler(IsAdmin(), text="🌍 Баланс WebMoney", state="*")
+async def payment_crystal_balance(message: Message, state: FSMContext):
+    await state.finish()
+
+    await (await wmAPI(message)).get_balance()
+
+
 @dp.message_handler(IsAdmin(), state="here_wm_wallet")
 async def payment_wm_edit_wallet(message: Message, state: FSMContext):
     await state.update_data(here_wm_wallet=message.text)
 
-    await state.set_state("here_wm_crt")
+    await state.set_state("here_wm_type")
     await message.answer(
-        "<b>🌍 Отправьте <code>CRT сертификат</code> (разрешением .pem)</b>\n"
+        "<b>🌍 Укажите тип Wallet (WMK, WMZ...)</b>\n"
     )
 
 
-@dp.message_handler(IsAdmin(), state="here_wm_crt")
-async def payment_wm_edit_crt(message: Message, state: FSMContext):
-    print("ff")
-    print(message.document.file_id)
-    await state.update_data(here_wm_crt=message.document.file_id)
-
-    await state.set_state("here_wm_key")
-    await message.answer(
-        "<b>🌍 Отправьте <code>KEY сертификат</code> (разрешением .pem)</b>\n"
-    )
 
 
-@dp.message_handler(IsAdmin(), state="here_wm_key")
+@dp.message_handler(IsAdmin(), state="here_wm_type")
 async def payment_wm_edit_key(message: Message, state: FSMContext):
-    print("gg")
     async with state.proxy() as data:
         wm_wallet = data['here_wm_wallet']
-        wm_crt = data['here_wm_crt']
-        wm_key = message.document
+        wm_type = message.text
 
 
     await state.finish()
@@ -263,4 +259,4 @@ async def payment_wm_edit_key(message: Message, state: FSMContext):
     cache_message = await message.answer("<b>🔄 Проверка введённых данных...</b>")
     await asyncio.sleep(0.5)
 
-    await (await wmAPI(cache_message, wallet=wm_wallet, crt=wm_crt, key=wm_key, add_pass=True)).pre_checker()
+    await (await wmAPI(cache_message, wallet=wm_wallet, type=wm_type, add_pass=True)).pre_checker()

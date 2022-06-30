@@ -22,7 +22,7 @@ def payments_frep():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row("🥝 Изменить QIWI", "🥝 Проверить QIWI", "🥝 Баланс QIWI")
     keyboard.row("💎 Изменить Crystal", "💎 Проверить Crystal", "💎 Баланс Crystal")
-    keyboard.row("🌍 Изменить WebMoney", "🌍 Проверить WebMoney")
+    keyboard.row("🌍 Изменить WebMoney", "🌍 Проверить WebMoney", "🌍 Баланс WebMoney")
     keyboard.row("⬅ Главное меню", "🖲 Способы пополнения")
 
     return keyboard

@@ -224,6 +224,14 @@ def get_refillx(**kwargs):
         return con.execute(sql, parameters).fetchone()
 
 
+def get_wm_add(**kwargs):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = f"SELECT * FROM storage_wm_add"
+        sql, parameters = update_format_args(sql, kwargs)
+        return con.execute(sql, parameters).fetchone()
+
+
 # Получение пополнений
 def get_refillsx(**kwargs):
     with sqlite3.connect(DATABASE_PATH) as con:

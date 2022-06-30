@@ -6,6 +6,7 @@ from aiogram import Dispatcher
 from bs4 import BeautifulSoup
 
 from tgbot.data.config import get_admins, bot_version, bot_description
+from tgbot.keyboards.inline_admin import check_wm
 from tgbot.keyboards.reply_z_all import menu_frep
 from tgbot.loader import bot
 from tgbot.services.api_sqlite import get_settingsx, update_settingsx, get_userx, get_purchasesx, get_all_positionsx, \
@@ -52,12 +53,18 @@ async def on_startup_notify(dp: Dispatcher):
 async def send_admins(message, markup=None, not_me=0):
     for admin in get_admins():
         if markup == "default": markup = menu_frep(admin)
+        elif markup[:2] == "wm":
+            user_id = markup[2:].split(':')[0]
+            amount = markup[2:].split(':')[1]
+            message_id = markup[2:].split(':')[2]
+            markup = check_wm(user_id, amount, message_id)
 
         try:
             if str(admin) != str(not_me):
                 await bot.send_message(admin, message, reply_markup=markup, disable_web_page_preview=True)
         except:
             pass
+
 
 
 # Автоматическая очистка ежедневной статистики после 00:00

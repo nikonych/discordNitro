@@ -4,12 +4,13 @@ from aiogram.types import CallbackQuery, Message
 from pycrystalpay import CrystalPay
 
 from tgbot.data import config
-from tgbot.keyboards.inline_user import refill_bill_finl, refill_choice_finl
+from tgbot.keyboards.inline_user import refill_bill_finl, refill_choice_finl, refill_bill_finl_wm
 from tgbot.loader import dp, bot
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
 from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, get_userx, get_crystal, has_referer, \
-    get_all_users_id, get_balance, get_ref_balance
+    get_all_users_id, get_balance, get_ref_balance, get_wm
+from tgbot.services.api_wm import wmAPI
 from tgbot.utils.const_functions import get_date, get_unix
 from tgbot.utils.misc_functions import send_admins
 
@@ -55,6 +56,10 @@ async def refill_get(message: Message, state: FSMContext):
                 get_payment, get_message = await (
                     await CrystalAPI(cache_message)
                 ).bill_pay(pay_amount)
+            elif get_way == 'WebMoney':
+                get_payment, get_message = await (
+                    await wmAPI(message)
+                ).bill_pay(pay_amount)
             else:
                 get_message, get_link, receipt = await (
                     await QiwiAPI(cache_message, user_bill_pass=True)
@@ -62,8 +67,10 @@ async def refill_get(message: Message, state: FSMContext):
 
             if get_message:
                 if get_way == 'Crystal':
-                    print(get_payment.id)
                     await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(get_payment.url, get_payment.id, get_way))
+                elif get_way == 'WebMoney':
+                    comment = str(message.from_user.id) + str(pay_amount)
+                    await cache_message.edit_text(get_message, reply_markup=refill_bill_finl_wm(comment, get_way))
                 else:
                     await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(get_link, receipt, get_way))
         else:
@@ -134,9 +141,7 @@ async def refill_check_form(call: CallbackQuery):
     crystal = CrystalPay(crystal_info['login'], crystal_info['secret'])
     payment = crystal.construct_payment_by_id(receipt)
 
-    print(payment.url)
     isPaid = payment.if_paid()
-    isPaid = True
 
     if isPaid:
         get_refill = get_refillx(refill_receipt=receipt)
@@ -149,37 +154,106 @@ async def refill_check_form(call: CallbackQuery):
                           "⌛ Попробуйте чуть позже.", True, cache_time=5)
 
 
+@dp.callback_query_handler(text_startswith="Pay:WebMoney")
+async def refill_check_form(call: CallbackQuery):
+    receipt = call.data.split(":")[2]
+    amount = receipt.replace(str(call.from_user.id), "")
+    wm = get_wm()
+
+    await call.answer("❗ Ожидайте подтверждение Админа", True)
+
+    await call.message.edit_text("❗ Проверьте пополнение WebMoney\n"
+                      "\n"
+                      f"Пользователь: @{call.from_user.username}\n"
+                      f"Коментарий к оплате: <code>{receipt}</code>\n"
+                      f"Сумма пополнения: <code>{amount}</code>\n"
+                      f"На счет: <code>{wm['wallet']}</code>\n")
+
+    await send_admins("❗ Проверьте пополнение WebMoney\n"
+                      "\n"
+                      f"Пользователь: <code>@{call.from_user.username}</code>\n"
+                      f"Коментарий к оплате: <code>{receipt}</code>\n"
+                      f"Сумма пополнения: <code>{amount}</code>\n"
+                      f"На счет: <code>{wm['wallet']}</code>\n", markup="wm" + str(call.from_user.id) + ":" + str(amount) + ":" + str(call.message.message_id))
+
+
+
+
+
+@dp.callback_query_handler(text_startswith="check_wm:")
+async def refill_check_add_wm(call: CallbackQuery):
+    status = call.data.split(":")[3]
+    user_id = call.data.split(":")[1]
+    amount = call.data.split(":")[2]
+    message_id = call.data.split(":")[4]
+
+
+    if status == "True":
+        await refill_success(call, str(user_id) + ":"+str(amount), int(amount), "WebMoney", message_id=message_id)
+        await call.message.delete()
+    else:
+        await bot.send_message(user_id, "Проверьте заново оплату и напишите в поддержку!")
+        await call.message.delete()
+
 
 ##########################################################################################
 ######################################### ПРОЧЕЕ #########################################
 # Зачисление средств
-async def refill_success(call: CallbackQuery, receipt, amount, get_way):
-    get_user = get_userx(user_id=call.from_user.id)
+async def refill_success(call: CallbackQuery, receipt, amount, get_way, message_id=None):
+    if message_id != None:
+        get_user = get_userx(user_id=int(receipt.split(":")[0]))
+    else:
+        get_user = get_userx(user_id=call.from_user.id)
+
 
     add_refillx(get_user['user_id'], get_user['user_login'], get_user['user_name'], receipt,
                 amount, receipt, get_way, get_date(), get_unix())
 
-    update_userx(call.from_user.id,
-                 user_balance=get_user['user_balance'] + amount,
-                 user_refill=get_user['user_refill'] + amount)
+    if message_id != None:
+        update_userx(get_user['user_id'],
+                     user_balance=get_user['user_balance'] + amount,
+                     user_refill=get_user['user_refill'] + amount)
+    else:
+        update_userx(call.from_user.id,
+                     user_balance=get_user['user_balance'] + amount,
+                     user_refill=get_user['user_refill'] + amount)
 
-    await call.message.edit_text(f"<b>💰 Вы пополнили баланс на сумму <code>{amount}₽</code>\n"
+    if message_id != None:
+        await bot.send_message(chat_id=get_user['user_id'], text=f"<b>💰 Вы пополнили баланс на сумму <code>{amount}₽</code>\n"
+                                 f"🧾 Чек: <code>#{receipt}</code></b>")
+    else:
+        await call.message.edit_text(f"<b>💰 Вы пополнили баланс на сумму <code>{amount}₽</code>\n"
                                  f"🧾 Чек: <code>#{receipt}</code></b>")
 
-    await send_admins(
-        f"👤 Пользователь: @{get_user['user_login']} | <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a> | <code>{get_user['user_id']}</code>\n"
-        f"💰 Сумма пополнения: <code>{amount}₽</code>\n"
-        f"🧾 Чек: <code>#{receipt}</code>"
-    )
+    if message_id == None:
+        await send_admins(
+            f"👤 Пользователь: @{get_user['user_login']} | <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a> | <code>{get_user['user_id']}</code>\n"
+            f"💰 Сумма пополнения: <code>{amount}₽</code>\n"
+            f"🧾 Чек: <code>#{receipt}</code>"
+        )
 
-    if int(has_referer(user_id=call.from_user.id)) != 0 and int(
-            has_referer(user_id=call.from_user.id)) in get_all_users_id():
-        balance = get_balance(has_referer(user_id=call.from_user.id))
-        ref_balance = get_ref_balance(has_referer(user_id=call.from_user.id))
-        print(ref_balance)
-        ref_balance += int(int(amount) * int(config.PERCENT) * 0.01)
-        balance += int(int(amount) * int(config.PERCENT) * 0.01)
-        update_userx(user_id=int(has_referer(user_id=call.from_user.id)), user_balance=balance, user_referer_balance=ref_balance)
+    if message_id != None:
+        if int(has_referer(user_id=get_user['user_id'])) != 0 and int(
+                has_referer(user_id=get_user['user_id'])) in get_all_users_id():
+            balance = get_balance(has_referer(user_id=get_user['user_id']))
+            ref_balance = get_ref_balance(has_referer(user_id=get_user['user_id']))
+            print(ref_balance)
+            ref_balance += int(int(amount) * int(config.PERCENT) * 0.01)
+            balance += int(int(amount) * int(config.PERCENT) * 0.01)
+            update_userx(user_id=int(has_referer(user_id=get_user['user_id'])), user_balance=balance,
+                         user_referer_balance=ref_balance)
 
-        await bot.send_message(int(has_referer(user_id=call.from_user.id)),
-                               f"От вашего реферала вам поступило: <code>{int(int(amount) * int(config.PERCENT) * 0.01)}₽</code>!")
+            await bot.send_message(int(has_referer(user_id=get_user['user_id'])),
+                                   f"От вашего реферала вам поступило: <code>{int(int(amount) * int(config.PERCENT) * 0.01)}₽</code>!")
+    else:
+        if int(has_referer(user_id=call.from_user.id)) != 0 and int(
+                has_referer(user_id=call.from_user.id)) in get_all_users_id():
+            balance = get_balance(has_referer(user_id=call.from_user.id))
+            ref_balance = get_ref_balance(has_referer(user_id=call.from_user.id))
+            print(ref_balance)
+            ref_balance += int(int(amount) * int(config.PERCENT) * 0.01)
+            balance += int(int(amount) * int(config.PERCENT) * 0.01)
+            update_userx(user_id=int(has_referer(user_id=call.from_user.id)), user_balance=balance, user_referer_balance=ref_balance)
+
+            await bot.send_message(int(has_referer(user_id=call.from_user.id)),
+                                   f"От вашего реферала вам поступило: <code>{int(int(amount) * int(config.PERCENT) * 0.01)}₽</code>!")

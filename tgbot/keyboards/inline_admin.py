@@ -1,7 +1,7 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton as ikb
 
-from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx, get_crystal, get_yoo
+from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx, get_crystal, get_yoo, isBan
 
 
 # Поиск профиля
@@ -16,6 +16,15 @@ def profile_search_finl(user_id):
     ).add(
         ikb("🔄 Обновить", callback_data=f"user_refresh:{user_id}")
     )
+    if not isBan(user_id):
+        keyboard.add(
+            ikb("❌ Забанить", callback_data=f"user_ban:True:{user_id}")
+        )
+    else:
+        keyboard.add(
+            ikb("✅ Разбанить", callback_data=f"user_ban:False:{user_id}")
+        )
+
 
     return keyboard
 

@@ -3,7 +3,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import BoundFilter
 
 from tgbot.data.config import get_admins
-from tgbot.services.api_sqlite import get_settingsx
+from tgbot.services.api_sqlite import get_settingsx, isBan
 
 
 # Проверка на админа
@@ -46,3 +46,12 @@ class IsWork(BoundFilter):
             return False
         else:
             return True
+
+
+class IsBan(BoundFilter):
+    async def check(self, message: types.Message):
+        isban = isBan(message.from_user.id)
+        if not isban:
+            return True
+        else:
+            return False

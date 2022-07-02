@@ -15,11 +15,12 @@ from tgbot.keyboards.reply_z_all import menu_frep
 from tgbot.loader import dp, bot
 from tgbot.services.api_sqlite import *
 from tgbot.utils.const_functions import get_date, split_messages, get_unix
+from tgbot.utils.misc.bot_filters import IsBan
 from tgbot.utils.misc_functions import open_profile_my, upload_text, get_faq
 
 
 # Открытие товаров
-@dp.message_handler(text="🎁 Купить", state="*")
+@dp.message_handler(IsBan(),text="🎁 Купить", state="*")
 async def user_shop(message: Message, state: FSMContext):
     await state.finish()
 
@@ -31,7 +32,7 @@ async def user_shop(message: Message, state: FSMContext):
 
 
 # Открытие профиля
-@dp.message_handler(text="👮‍♀️ Профиль", state="*")
+@dp.message_handler(IsBan(), text="👮‍♀️ Профиль", state="*")
 async def user_profile(message: Message, state: FSMContext):
     await state.finish()
 
@@ -40,7 +41,7 @@ async def user_profile(message: Message, state: FSMContext):
 
 
 # Открытие FAQ
-@dp.message_handler(text=["📕 Правила", "/faq"], state="*")
+@dp.message_handler(IsBan(), text=["📕 Правила", "/faq"], state="*")
 async def user_faq(message: Message, state: FSMContext):
     await state.finish()
 
@@ -54,7 +55,7 @@ async def user_faq(message: Message, state: FSMContext):
 
 
 # Открытие сообщения с ссылкой на поддержку
-@dp.message_handler(text=["☎ Поддержка", "/support"], state="*")
+@dp.message_handler(IsBan(), text=["☎ Поддержка", "/support"], state="*")
 async def user_support(message: Message, state: FSMContext):
     await state.finish()
 
@@ -106,7 +107,7 @@ async def user_profile_return(message: Union['Message', 'CallbackQuery'], state:
 
 
 # Referer system
-@dp.message_handler(text="🤑 Реферальная система")
+@dp.message_handler(IsBan(), text="🤑 Реферальная система")
 async def user_referer(message: Message, state: FSMContext):
     percent = config.PERCENT
     me = await bot.get_me()

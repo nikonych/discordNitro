@@ -102,6 +102,13 @@ def has_referer(user_id):
         sql = f"SELECT user_referer FROM storage_users where `user_id` = {user_id}"
         return con.execute(sql).fetchall()[0]['user_referer']
 
+
+def isBan(user_id):
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = dict_factory
+        sql = f"SELECT is_banned FROM storage_users where `user_id` = {user_id}"
+        return con.execute(sql).fetchall()[0]['is_banned']
+
 def get_balance(user_id):
     with sqlite3.connect(DATABASE_PATH) as con:
         con.row_factory = dict_factory
@@ -538,7 +545,7 @@ def create_dbx():
         con.row_factory = dict_factory
 
         # Создание БД с хранением данных пользователей
-        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 10:
+        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 11:
             print("DB was found(1/10)")
         else:
             con.execute("CREATE TABLE storage_users("
@@ -551,7 +558,8 @@ def create_dbx():
                         "user_date TIMESTAMP,"
                         "user_unix INTEGER,"
                         "user_referer INTEGER DEFAULT 0,"
-                        "user_referer_balance INTEGER DEFAULT 0)")
+                        "user_referer_balance INTEGER DEFAULT 0,"
+                        "is_banned boolean default FALSE)")
             print("DB was not found(1/10) | Creating...")
 
         # Создание БД с хранением данных платежных систем

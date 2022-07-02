@@ -8,7 +8,7 @@ from tgbot.keyboards.inline_user import user_support_finl
 from tgbot.keyboards.reply_z_all import menu_frep
 from tgbot.loader import dp
 from tgbot.services.api_sqlite import get_settingsx, get_userx
-from tgbot.utils.misc.bot_filters import IsBuy, IsRefill, IsWork
+from tgbot.utils.misc.bot_filters import IsBuy, IsRefill, IsWork, IsBan
 
 # Игнор-колбэки покупок
 prohibit_buy = ['buy_category_open', 'buy_category_return', 'buy_category_nextp', 'buy_category_backp',
@@ -22,7 +22,7 @@ prohibit_refill = ['user_refill', 'refill_choice', 'Pay:', 'Pay:Form', 'Pay:Numb
 ####################################################################################################
 ######################################## ТЕХНИЧЕСКИЕ РАБОТЫ ########################################
 # Фильтр на технические работы - сообщение
-@dp.message_handler(IsWork(), state="*")
+@dp.message_handler(IsWork(), IsBan(), state="*")
 async def filter_work_message(message: Message, state: FSMContext):
     await state.finish()
 
@@ -39,7 +39,7 @@ async def filter_work_message(message: Message, state: FSMContext):
 
 
 # Фильтр на технические работы - колбэк
-@dp.callback_query_handler(IsWork(), state="*")
+@dp.callback_query_handler(IsWork(), IsBan(), state="*")
 async def filter_work_callback(call: CallbackQuery, state: FSMContext):
     await state.finish()
 
@@ -49,7 +49,7 @@ async def filter_work_callback(call: CallbackQuery, state: FSMContext):
 ####################################################################################################
 ########################################### СТАТУС ПОКУПОК #########################################
 # Фильтр на доступность покупок - сообщение
-@dp.message_handler(IsBuy(), text="🎁 Купить", state="*")
+@dp.message_handler(IsBuy(), IsBan(), text="🎁 Купить", state="*")
 @dp.message_handler(IsBuy(), state="here_purchase_count")
 async def filter_buy_message(message: Message, state: FSMContext):
     await state.finish()
@@ -58,7 +58,7 @@ async def filter_buy_message(message: Message, state: FSMContext):
 
 
 # Фильтр на доступность покупок - колбэк
-@dp.callback_query_handler(IsBuy(), text_startswith=prohibit_buy, state="*")
+@dp.callback_query_handler(IsBan(), IsBuy(), text_startswith=prohibit_buy, state="*")
 async def filter_buy_callback(call: CallbackQuery, state: FSMContext):
     await state.finish()
 
@@ -68,7 +68,7 @@ async def filter_buy_callback(call: CallbackQuery, state: FSMContext):
 ####################################################################################################
 ######################################### СТАТУС ПОПОЛНЕНИЙ ########################################
 # Фильтр на доступность пополнения - сообщение
-@dp.message_handler(IsRefill(), state="here_pay_amount")
+@dp.message_handler(IsBan(), IsRefill(), state="here_pay_amount")
 async def filter_refill(message: Message, state: FSMContext):
     await state.finish()
 
@@ -76,7 +76,7 @@ async def filter_refill(message: Message, state: FSMContext):
 
 
 # Фильтр на доступность пополнения - колбэк
-@dp.callback_query_handler(IsRefill(), text_startswith=prohibit_refill, state="*")
+@dp.callback_query_handler(IsBan(), IsRefill(), text_startswith=prohibit_refill, state="*")
 async def filter_refill(call: CallbackQuery, state: FSMContext):
     await state.finish()
 
@@ -86,7 +86,7 @@ async def filter_refill(call: CallbackQuery, state: FSMContext):
 ####################################################################################################
 ############################################## ПРОЧЕЕ ##############################################
 # Открытие главного меню
-@dp.message_handler(text=['⬅ Главное меню', '/start'], state="*")
+@dp.message_handler(IsBan(), text=['⬅ Главное меню', '/start'], state="*")
 async def main_start(message: Message, state: FSMContext):
     await state.finish()
     await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>👋 Приветик {message.from_user.first_name}!</b>\n"

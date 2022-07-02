@@ -127,6 +127,17 @@ async def functions_profile_refresh(call: CallbackQuery, state: FSMContext):
     await call.message.answer(open_profile_search(user_id), reply_markup=profile_search_finl(user_id))
 
 
+@dp.callback_query_handler(IsAdmin(), text_startswith="user_ban", state="*")
+async def functions_profile_refresh(call: CallbackQuery, state: FSMContext):
+    user_id = call.data.split(":")[2]
+    status = call.data.split(":")[1]
+    if status == "True":
+        update_userx(user_id=int(user_id), is_banned=True)
+    else:
+        update_userx(user_id=int(user_id), is_banned=False)
+    await call.message.edit_text(text=call.message.text, reply_markup=profile_search_finl(int(user_id)))
+
+
 ######################################## ПРИНЯТИЕ ДАННЫХ ########################################
 # Принятие текста для рассылки
 @dp.message_handler(IsAdmin(), state="here_ad_text")

@@ -1,2 +1,52 @@
-ERROR | 2022-07-02 18:20:58,702 | main.py:40 | BOT WAS STARTED
+ERROR | 2022-07-02 19:05:57,140 | main.py:40 | BOT WAS STARTED
 NoneType: None
+ERROR | 2022-07-02 19:06:22,520 | z_all_errors.py:63 | Exception: Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+Update: {"update_id":565302894,"callback_query":{"id":"4134613427996847594","from":{"id":962664705,"is_bot":false,"first_name":"Heisenbergᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧᅠᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧ","username":"nniIkon","language_code":"en"},"message":{"message_id":3577,"from":{"id":1630251130,"is_bot":true,"first_name":"fucknow","username":"ganslohbot"},"chat":{"id":962664705,"first_name":"Heisenbergᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧᅠᅠࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣩࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧࣧ","username":"nniIkon","type":"private"},"date":1656767163,"edit_date":1656767172,"text":"👮‍♀️ Профиль пользователя: Nikon\n➖➖➖➖➖➖➖➖➖➖\n🆔 ID: 2015280473\n👤 Логин: @nikonoon\nⓂ Имя: Nikon\n🕰 Регистрация: 27.06.2022 12:03:08 (5 дней)\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n💰 Баланс: 5000₽\n💰 Всего пополнено: 52373₽\n🎁 Куплено товаров: 21шт","entities":[{"type":"mention","offset":73,"length":9}],"reply_markup":{"inline_keyboard":[[{"text":"💰 Изменить баланс","callback_data":"user_balance_set:2015280473"},{"text":"💰 Выдать баланс","callback_data":"user_balance_add:2015280473"}],[{"text":"🎁 Покупки","callback_data":"user_purchases:2015280473"},{"text":"💌 Отправить СМС","callback_data":"user_message:2015280473"}],[{"text":"🔄 Обновить","callback_data":"user_refresh:2015280473"}],[{"text":"✅ Разбанить","callback_data":"user_ban:False:2015280473"}]]}},"chat_instance":"7582974048481942904","data":"user_ban:False:2015280473"}}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 283, in process_update
+    return await self.callback_query_handlers.notify(update.callback_query)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/handler.py", line 116, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "/home/niko/Documents/autoshopDjimbo3.0/tgbot/handlers/admin_functions.py", line 138, in functions_profile_refresh
+    await call.message.edit_text(text=call.message.text, reply_markup=profile_search_finl(int(user_id)))
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/types/message.py", line 2838, in edit_text
+    return await self.bot.edit_message_text(
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/bot.py", line 2740, in edit_message_text
+    result = await self.request(api.Methods.EDIT_MESSAGE_TEXT, payload)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/base.py", line 231, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 115, in check_result
+    exceptions.BadRequest.detect(description)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/utils/exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.MessageNotModified: Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+ERROR | 2022-07-02 19:06:22,524 | executor.py:323 | Task exception was never retrieved
+future: <Task finished name='Task-44' coro=<Dispatcher._process_polling_updates() done, defined at /usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py:407> exception=MessageNotModified('Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message')>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/handler.py", line 116, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 283, in process_update
+    return await self.callback_query_handlers.notify(update.callback_query)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/handler.py", line 116, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "/home/niko/Documents/autoshopDjimbo3.0/tgbot/handlers/admin_functions.py", line 138, in functions_profile_refresh
+    await call.message.edit_text(text=call.message.text, reply_markup=profile_search_finl(int(user_id)))
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/types/message.py", line 2838, in edit_text
+    return await self.bot.edit_message_text(
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/bot.py", line 2740, in edit_message_text
+    result = await self.request(api.Methods.EDIT_MESSAGE_TEXT, payload)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/base.py", line 231, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 115, in check_result
+    exceptions.BadRequest.detect(description)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/utils/exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.MessageNotModified: Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message

@@ -86,7 +86,7 @@ async def filter_refill(call: CallbackQuery, state: FSMContext):
 ####################################################################################################
 ############################################## ПРОЧЕЕ ##############################################
 # Открытие главного меню
-@dp.message_handler(IsBan(), text=['⬅ Главное меню', '/start'], state="*")
+@dp.message_handler( text=['⬅ Главное меню', '/start'], state="*")
 async def main_start(message: Message, state: FSMContext):
     await state.finish()
     await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>👋 Приветик {message.from_user.first_name}!</b>\n"

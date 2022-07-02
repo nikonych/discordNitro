@@ -9,6 +9,7 @@ def menu_frep(user_id):
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row("🎁 Купить", "👮‍♀️ Профиль")
     keyboard.row("☎ Поддержка", "📕 Правила")
+    keyboard.row("🤑 Реферальная система")
 
     if user_id in get_admins():
         keyboard.row("🎁 Управление товарами", "📜 Статистика")
@@ -22,7 +23,7 @@ def payments_frep():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row("🥝 Изменить QIWI", "🥝 Проверить QIWI", "🥝 Баланс QIWI")
     keyboard.row("💎 Изменить Crystal", "💎 Проверить Crystal", "💎 Баланс Crystal")
-    keyboard.row("🌍 Изменить WebMoney", "🌍 Проверить WebMoney", "🌍 Баланс WebMoney")
+    keyboard.row("🌍 Изменить Yoomoney", "🌍 Проверить Yoomoney", "🌍 Баланс Yoomoney")
     keyboard.row("⬅ Главное меню", "🖲 Способы пополнения")
 
     return keyboard

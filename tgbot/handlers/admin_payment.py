@@ -3,15 +3,16 @@ import asyncio
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pycrystalpay import CrystalPay
+from yoomoney import Client
 
 from tgbot.keyboards.inline_admin import payment_choice_finl
 from tgbot.loader import dp
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
-from tgbot.services.api_sqlite import update_paymentx, get_paymentx, update_crystal, get_crystal, update_wm
-from tgbot.services.api_wm import wmAPI
+from tgbot.services.api_sqlite import update_paymentx, get_paymentx, update_crystal, get_crystal, update_yoo
+from tgbot.services.api_YooMoney import YooMoneyAPI
 from tgbot.utils.misc.bot_filters import IsAdmin
 
 
@@ -41,14 +42,14 @@ async def payment_systems_edit(call: CallbackQuery):
                 update_crystal(status=1)
         except:
             await call.answer("❗ Добавьте Crystal перед включением Способов пополнений.", True)
-    elif way_pay == 'WebMoney':
+    elif way_pay == 'YooMoney':
         try:
             if way_status == 'False':
-                update_wm(status=0)
+                update_yoo(status=0)
             else:
-                update_wm(status=1)
+                update_yoo(status=1)
         except:
-            await call.answer("❗ Добавьте WebMoney перед включением Способов пополнений.", True)
+            await call.answer("❗ Добавьте YooMoney перед включением Способов пополнений.", True)
     else:
 
         get_payment = get_paymentx()
@@ -61,14 +62,14 @@ async def payment_systems_edit(call: CallbackQuery):
                     await call.answer(
                         "❗ Приватный ключ отсутствует. Измените киви и добавьте приватный ключ для включения оплаты по Форме",
                         True)
-            elif way_pay == "Number":
-                update_paymentx(way_number=way_status)
-            elif way_pay == "Nickname":
-                status, response = await (await QiwiAPI(call)).get_nickname()
-                if status:
-                    update_paymentx(way_nickname=way_status, qiwi_nickname=response)
-                else:
-                    await call.answer(response, True)
+            # elif way_pay == "Number":
+            #     update_paymentx(way_number=way_status)
+            # elif way_pay == "Nickname":
+            #     status, response = await (await QiwiAPI(call)).get_nickname()
+            #     if status:
+            #         update_paymentx(way_nickname=way_status, qiwi_nickname=response)
+            #     else:
+            #         await call.answer(response, True)
         else:
             await call.answer("❗ Добавьте киви кошелёк перед включением Способов пополнений.", True)
 
@@ -211,52 +212,86 @@ async def payment_crystal_edit_secret(message: Message, state: FSMContext):
 ###################################################################################
 ####################################### WebMoney ##################################
 # Изменение WebMoney кошелька
-@dp.message_handler(IsAdmin(), text="🌍 Изменить WebMoney", state="*")
+@dp.message_handler(IsAdmin(), text="🌍 Изменить Yoomoney", state="*")
 async def payment_crystal_edit(message: Message, state: FSMContext):
     await state.finish()
 
-    await state.set_state("here_wm_wallet")
-    await message.answer("<b>🌍 Введите <code>wallet</code> WebMoney</b>")
+    await state.set_state("here_yoo_client_id")
+    await message.answer("<b>🌍 Введите <code>Client_id</code> YooMoney</b>")
 
 
 # Проверка работоспособности WebMoney
-@dp.message_handler(IsAdmin(), text="🌍 Проверить WebMoney", state="*")
+@dp.message_handler(IsAdmin(), text="🌍 Проверить Yoomoney", state="*")
 async def payment_crystal_check(message: Message, state: FSMContext):
     await state.finish()
 
-    await (await wmAPI(message, check_pass=True)).pre_checker()
+    await (await YooMoneyAPI(message, check_pass=True)).pre_checker()
 
 
 # Баланс WebMoney
-@dp.message_handler(IsAdmin(), text="🌍 Баланс WebMoney", state="*")
+@dp.message_handler(IsAdmin(), text="🌍 Баланс Yoomoney", state="*")
 async def payment_crystal_balance(message: Message, state: FSMContext):
     await state.finish()
 
-    await (await wmAPI(message)).get_balance()
+    await (await YooMoneyAPI(message)).get_balance()
 
 
-@dp.message_handler(IsAdmin(), state="here_wm_wallet")
+@dp.message_handler(IsAdmin(), state="here_yoo_client_id")
 async def payment_wm_edit_wallet(message: Message, state: FSMContext):
-    await state.update_data(here_wm_wallet=message.text)
+    await state.update_data(here_yoo_client_id=message.text)
 
-    await state.set_state("here_wm_type")
+    await state.set_state("here_yoo_redirect")
     await message.answer(
-        "<b>🌍 Укажите тип Wallet (WMK, WMZ...)</b>\n"
+        "<b>🌍 Введите <code>Redirect_URI</code> YooMoney</b>"
     )
 
 
 
 
-@dp.message_handler(IsAdmin(), state="here_wm_type")
+@dp.message_handler(IsAdmin(), state="here_yoo_redirect")
 async def payment_wm_edit_key(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        wm_wallet = data['here_wm_wallet']
-        wm_type = message.text
+        client_id = data['here_yoo_client_id']
+        redirect = message.text
+        await state.update_data(here_yoo_redirect=message.text)
 
 
-    await state.finish()
 
     cache_message = await message.answer("<b>🔄 Проверка введённых данных...</b>")
     await asyncio.sleep(0.5)
 
-    await (await wmAPI(cache_message, wallet=wm_wallet, type=wm_type, add_pass=True)).pre_checker()
+    link = await (await YooMoneyAPI(cache_message, client_id=client_id, redirect=redirect)).get_link()
+    if link != False:
+        await state.set_state("here_yoo_getcode")
+        keyboard = InlineKeyboardMarkup()
+        keyboard.add(InlineKeyboardButton("Ссылка на авторизацию", url=link))
+        await message.answer("<b>1) Посетите этот веб-сайт</b> \n"
+                             "<b>2) Подтвердите запрос на авторизацию приложения</b>\n"
+                             "<b>3) После подтверждения отправьте ссылку сайта на который вас перенесли</b>",
+                             reply_markup=keyboard)
+    else:
+        await message.answer("<b>YooMoney данные не прошли проверку</b>")
+
+
+@dp.message_handler(IsAdmin(), state="here_yoo_getcode")
+async def payment_yoomoney_get_code(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        client_id = data['here_yoo_client_id']
+        redirect = data['here_yoo_redirect']
+    link = message.text
+
+    # await state.finish()
+
+    cache_message = await message.answer("<b>🔄 Проверка введённых данных...</b>")
+    await asyncio.sleep(0.5)
+
+    token = await (await YooMoneyAPI(cache_message, client_id=client_id, redirect=redirect)).get_token(link)
+    if token != False:
+        client = Client(token)
+        user = client.account_info()
+        update_yoo(client_id=client_id, token=token, redirect_uri=redirect, wallet=user.account)
+        await message.answer("<b>YooMoney был успешно изменён</b>")
+    else:
+        await message.answer("<b>YooMoney данные не прошли проверку</b>")
+
+

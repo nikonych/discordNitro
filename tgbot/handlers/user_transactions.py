@@ -2,6 +2,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from pycrystalpay import CrystalPay
+from yoomoney import Client
 
 from tgbot.data import config
 from tgbot.keyboards.inline_user import refill_bill_finl, refill_choice_finl, refill_bill_finl_wm
@@ -9,8 +10,8 @@ from tgbot.loader import dp, bot
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
 from tgbot.services.api_sqlite import update_userx, get_refillx, add_refillx, get_userx, get_crystal, has_referer, \
-    get_all_users_id, get_balance, get_ref_balance, get_wm
-from tgbot.services.api_wm import wmAPI
+    get_all_users_id, get_balance, get_ref_balance, get_yoo
+from tgbot.services.api_YooMoney import YooMoneyAPI
 from tgbot.utils.const_functions import get_date, get_unix
 from tgbot.utils.misc_functions import send_admins
 
@@ -23,7 +24,7 @@ async def refill_way(call: CallbackQuery, state: FSMContext):
     get_kb = refill_choice_finl()
 
     if get_kb is not None:
-        await call.message.edit_text("<b>💰 Выберите способ пополнения</b>",
+        await call.message.edit_caption("<b>💰 Выберите способ пополнения</b>",
                                      reply_markup=get_kb)
     else:
         await call.answer("⛔ Пополнение временно недоступно", True)
@@ -37,7 +38,7 @@ async def refill_way_choice(call: CallbackQuery, state: FSMContext):
     await state.update_data(here_pay_way=get_way)
 
     await state.set_state("here_pay_amount")
-    await call.message.edit_text("<b>💰 Введите сумму пополнения</b>")
+    await call.message.edit_caption("<b>💰 Введите сумму пополнения</b>")
 
 
 ###################################################################################
@@ -56,9 +57,9 @@ async def refill_get(message: Message, state: FSMContext):
                 get_payment, get_message = await (
                     await CrystalAPI(cache_message)
                 ).bill_pay(pay_amount)
-            elif get_way == 'WebMoney':
-                get_payment, get_message = await (
-                    await wmAPI(message)
+            elif get_way == 'YooMoney':
+                quickpay, get_message = await (
+                    await YooMoneyAPI(message)
                 ).bill_pay(pay_amount)
             else:
                 get_message, get_link, receipt = await (
@@ -68,9 +69,8 @@ async def refill_get(message: Message, state: FSMContext):
             if get_message:
                 if get_way == 'Crystal':
                     await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(get_payment.url, get_payment.id, get_way))
-                elif get_way == 'WebMoney':
-                    comment = str(message.from_user.id) + str(pay_amount)
-                    await cache_message.edit_text(get_message, reply_markup=refill_bill_finl_wm(comment, get_way))
+                elif get_way == 'YooMoney':
+                    await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(quickpay.redirected_url, quickpay.label, get_way))
                 else:
                     await cache_message.edit_text(get_message, reply_markup=refill_bill_finl(get_link, receipt, get_way))
         else:
@@ -154,46 +154,36 @@ async def refill_check_form(call: CallbackQuery):
                           "⌛ Попробуйте чуть позже.", True, cache_time=5)
 
 
-@dp.callback_query_handler(text_startswith="Pay:WebMoney")
+@dp.callback_query_handler(text_startswith="Pay:YooMoney")
 async def refill_check_form(call: CallbackQuery):
-    receipt = call.data.split(":")[2]
-    amount = receipt.replace(str(call.from_user.id), "")
-    wm = get_wm()
-
-    await call.answer("❗ Ожидайте подтверждение Админа", True)
-
-    await call.message.edit_text("❗ Проверьте пополнение WebMoney\n"
-                      "\n"
-                      f"Пользователь: @{call.from_user.username}\n"
-                      f"Коментарий к оплате: <code>{receipt}</code>\n"
-                      f"Сумма пополнения: <code>{amount}</code>\n"
-                      f"На счет: <code>{wm['wallet']}</code>\n")
-
-    await send_admins("❗ Проверьте пополнение WebMoney\n"
-                      "\n"
-                      f"Пользователь: <code>@{call.from_user.username}</code>\n"
-                      f"Коментарий к оплате: <code>{receipt}</code>\n"
-                      f"Сумма пополнения: <code>{amount}</code>\n"
-                      f"На счет: <code>{wm['wallet']}</code>\n", markup="wm" + str(call.from_user.id) + ":" + str(amount) + ":" + str(call.message.message_id))
-
-
-
-
-
-@dp.callback_query_handler(text_startswith="check_wm:")
-async def refill_check_add_wm(call: CallbackQuery):
-    status = call.data.split(":")[3]
-    user_id = call.data.split(":")[1]
-    amount = call.data.split(":")[2]
-    message_id = call.data.split(":")[4]
-
-
-    if status == "True":
-        await refill_success(call, str(user_id) + ":"+str(amount), int(amount), "WebMoney", message_id=message_id)
-        await call.message.delete()
+    label = call.data.split(":")[2]
+    yoo_info = get_yoo()
+    client = Client(yoo_info['token'])
+    history = client.operation_history(label=label)
+    for operation in history.operations:
+        # print()
+        # print("Operation:", operation.operation_id)
+        # print("\tStatus     -->", operation.status)
+        # print("\tDatetime   -->", operation.datetime)
+        # print("\tTitle      -->", operation.title)
+        # print("\tPattern id -->", operation.pattern_id)
+        # print("\tDirection  -->", operation.direction)
+        # print("\tAmount     -->", operation.amount)
+        # print("\tLabel      -->", operation.label)
+        # print("\tType       -->", operation.type)
+        get_refill = get_refillx(refill_receipt=label)
+        if get_refill is None:
+            await refill_success(call, label, operation.amount, "YooMoney")
+        else:
+            await call.answer("❗ Ваше пополнение уже было зачислено.", True)
     else:
-        await bot.send_message(user_id, "Проверьте заново оплату и напишите в поддержку!")
-        await call.message.delete()
+        await call.answer("❗ Платёж не был найден.\n"
+                          "⌛ Попробуйте чуть позже.", True, cache_time=5)
+
+
+
+
+
 
 
 ##########################################################################################

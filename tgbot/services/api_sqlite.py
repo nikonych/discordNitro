@@ -150,10 +150,10 @@ def get_crystal():
         sql = "SELECT * FROM storage_crystal"
         return con.execute(sql).fetchone()
 
-def get_wm():
+def get_yoo():
     with sqlite3.connect(DATABASE_PATH) as con:
         con.row_factory = dict_factory
-        sql = "SELECT * FROM storage_wm"
+        sql = "SELECT * FROM storage_ymoney"
         return con.execute(sql).fetchone()
 
 
@@ -175,10 +175,10 @@ def update_crystal(**kwargs):
         con.execute(sql, parameters)
         con.commit()
 
-def update_wm(**kwargs):
+def update_yoo(**kwargs):
     with sqlite3.connect(DATABASE_PATH) as con:
         con.row_factory = dict_factory
-        sql = "UPDATE storage_wm SET"
+        sql = "UPDATE storage_ymoney SET"
         sql, parameters = update_format(sql, kwargs)
         con.execute(sql, parameters)
         con.commit()
@@ -682,14 +682,16 @@ def create_dbx():
                         "status boolean)")
             print("DB was not found(9/10) | Creating...")
 
-        if len(con.execute("PRAGMA table_info(storage_wm)").fetchall()) == 4:
+        if len(con.execute("PRAGMA table_info(storage_ymoney)").fetchall()) == 5:
             print("DB was found(10/10)")
         else:
-            con.execute("create table storage_wm("
-                        "wallet  TEXT,"
-                        "type TEXT,"
-                        "status boolean,"
-                        "balance INTEGER)")
+            con.execute("create table storage_ymoney("\
+                            "wallet text,"\
+                            "token text,"\
+                            "status boolean,"\
+                            "client_id text,"\
+                            "redirect_uri text"\
+                        ")")
             print("DB was not found(10/10) | Creating...")
 
         con.commit()

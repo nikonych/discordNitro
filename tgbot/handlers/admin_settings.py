@@ -63,7 +63,6 @@ async def settings_turn_buy(call: CallbackQuery, state: FSMContext):
     await send_admins(
         f"👤 Администратор <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a>\n"
         f"{send_text}", not_me=get_user['user_id'])
-
     await call.message.edit_reply_markup(reply_markup=turn_open_finl())
 
 

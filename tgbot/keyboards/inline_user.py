@@ -1,7 +1,7 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from tgbot.services.api_sqlite import get_paymentx, get_crystal, get_wm
+from tgbot.services.api_sqlite import get_paymentx, get_crystal, get_yoo
 
 
 # Выбор способов пополнения
@@ -10,21 +10,21 @@ def refill_choice_finl():
 
     get_payments = get_paymentx()
     crystal = get_crystal()
-    wm = get_wm()
+    wm = get_yoo()
     active_kb = []
 
     if get_payments['way_form'] == "True":
         active_kb.append(InlineKeyboardButton("📋 QIWI форма", callback_data="refill_choice:Form"))
-    if get_payments['way_number'] == "True":
-        active_kb.append(InlineKeyboardButton("📞 QIWI номер", callback_data="refill_choice:Number"))
-    if get_payments['way_nickname'] == "True":
-        active_kb.append(InlineKeyboardButton("Ⓜ QIWI никнейм", callback_data="refill_choice:Nickname"))
+    # if get_payments['way_number'] == "True":
+    #     active_kb.append(InlineKeyboardButton("📞 QIWI номер", callback_data="refill_choice:Number"))
+    # if get_payments['way_nickname'] == "True":
+    #     active_kb.append(InlineKeyboardButton("Ⓜ QIWI никнейм", callback_data="refill_choice:Nickname"))
 
     if crystal['status'] == True:
         active_kb.append(InlineKeyboardButton("💎 Crystal", callback_data="refill_choice:Crystal"))
 
     if wm['status'] == True:
-        active_kb.append(InlineKeyboardButton("🌍 WebMoney", callback_data="refill_choice:WebMoney"))
+        active_kb.append(InlineKeyboardButton("🌍 Yoomoney", callback_data="refill_choice:YooMoney"))
 
 
     if len(active_kb) == 5:
@@ -62,10 +62,10 @@ def refill_bill_finl(send_requests, get_receipt, get_way):
     return keyboard
 
 
-def refill_bill_finl_wm(get_receipt, get_way):
+def refill_bill_finl_wm(send_requests):
     keyboard = InlineKeyboardMarkup(
     ).add(
-        InlineKeyboardButton("🔄 Проверить оплату", callback_data=f"Pay:{get_way}:{get_receipt}")
+        InlineKeyboardButton("🌀 Перейти к оплате", url=send_requests)
     )
 
     return keyboard

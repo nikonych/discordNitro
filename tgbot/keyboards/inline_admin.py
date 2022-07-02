@@ -1,7 +1,7 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton as ikb
 
-from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx, get_crystal, get_wm
+from tgbot.services.api_sqlite import get_paymentx, get_settingsx, get_userx, get_crystal, get_yoo
 
 
 # Поиск профиля
@@ -26,22 +26,22 @@ def payment_choice_finl():
     get_payments = get_paymentx()
 
     crystal_info = get_crystal()
-    wm_info = get_wm()
+    wm_info = get_yoo()
 
     if get_payments['way_form'] == "True":
         status_form_kb = ikb("✅", callback_data="change_payment:Form:False")
     else:
         status_form_kb = ikb("❌", callback_data="change_payment:Form:True")
 
-    if get_payments['way_number'] == "True":
-        status_number_kb = ikb("✅", callback_data="change_payment:Number:False")
-    else:
-        status_number_kb = ikb("❌", callback_data="change_payment:Number:True")
-
-    if get_payments['way_nickname'] == "True":
-        status_nickname_kb = ikb("✅", callback_data="change_payment:Nickname:False")
-    else:
-        status_nickname_kb = ikb("❌", callback_data="change_payment:Nickname:True")
+    # if get_payments['way_number'] == "True":
+    #     status_number_kb = ikb("✅", callback_data="change_payment:Number:False")
+    # else:
+    #     status_number_kb = ikb("❌", callback_data="change_payment:Number:True")
+    #
+    # if get_payments['way_nickname'] == "True":
+    #     status_nickname_kb = ikb("✅", callback_data="change_payment:Nickname:False")
+    # else:
+    #     status_nickname_kb = ikb("❌", callback_data="change_payment:Nickname:True")
 
     if crystal_info['status'] == 1:
         status_crystal_kb = ikb("✅", callback_data="change_payment:Crystal:False")
@@ -49,15 +49,15 @@ def payment_choice_finl():
         status_crystal_kb = ikb("❌", callback_data="change_payment:Crystal:True")
 
     if wm_info['status'] == 1:
-        status_wm_kb = ikb("✅", callback_data="change_payment:WebMoney:False")
+        status_wm_kb = ikb("✅", callback_data="change_payment:YooMoney:False")
     else:
-        status_wm_kb = ikb("❌", callback_data="change_payment:WebMoney:True")
+        status_wm_kb = ikb("❌", callback_data="change_payment:YooMoney:True")
 
     keyboard.add(ikb("📋 По форме", url="https://vk.cc/bYjKGM"), status_form_kb)
-    keyboard.add(ikb("📞 По номеру", url="https://vk.cc/bYjKEy"), status_number_kb)
-    keyboard.add(ikb("Ⓜ По никнейму", url="https://vk.cc/c8s66X"), status_nickname_kb)
+    # keyboard.add(ikb("📞 По номеру", url="https://vk.cc/bYjKEy"), status_number_kb)
+    # keyboard.add(ikb("Ⓜ По никнейму", url="https://vk.cc/c8s66X"), status_nickname_kb)
     keyboard.add(ikb("💎 Crystal", url="https://vk.cc/c8s66X"), status_crystal_kb)
-    keyboard.add(ikb("🌍 WebMoney", url="https://vk.cc/c8s66X"), status_wm_kb)
+    keyboard.add(ikb("🤍 YooMoney", url="https://vk.cc/c8s66X"), status_wm_kb)
 
     return keyboard
 

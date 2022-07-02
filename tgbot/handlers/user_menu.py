@@ -24,10 +24,10 @@ async def user_shop(message: Message, state: FSMContext):
     await state.finish()
 
     if len(get_all_categoriesx()) >= 1:
-        await message.answer("<b>🎁 Выберите нужный вам товар:</b>",
-                             reply_markup=products_item_category_open_fp(0))
+        await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption="<b>🎁 Выберите нужный вам товар:</b>",
+                                   reply_markup=products_item_category_open_fp(0))
     else:
-        await message.answer("<b>🎁 Товары в данное время отсутствуют.</b>")
+        await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption="<b>🎁 Товары в данное время отсутствуют.</b>")
 
 
 # Открытие профиля
@@ -36,7 +36,7 @@ async def user_profile(message: Message, state: FSMContext):
     await state.finish()
 
     me = await bot.get_me()
-    await message.answer(open_profile_my(message.from_user.id, me), reply_markup=profile_open_inl)
+    await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=open_profile_my(message.from_user.id, me), reply_markup=profile_open_inl)
 
 
 # Открытие FAQ
@@ -48,7 +48,9 @@ async def user_faq(message: Message, state: FSMContext):
     if send_message == "None":
         send_message = f"ℹ Информация. Измените её в настройках бота.\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n{bot_description}"
 
-    await message.answer(get_faq(message.from_user.id, send_message), disable_web_page_preview=True)
+    await message.answer_photo(requests.get(
+        "https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content,
+                               caption=get_faq(message.from_user.id, send_message))
 
 
 # Открытие сообщения с ссылкой на поддержку
@@ -61,8 +63,10 @@ async def user_support(message: Message, state: FSMContext):
         get_user = get_userx(user_id=user_support)
 
         if len(get_user['user_login']) >= 1:
-            await message.answer("<b>☎ Нажмите кнопку ниже для связи с Администратором.</b>",
-                                 reply_markup=user_support_finl(get_user['user_login']))
+            await message.answer_photo(requests.get(
+                "https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content,
+                                       caption="<b>☎ Нажмите кнопку ниже для связи с Администратором.</b>",
+                                       reply_markup=user_support_finl(get_user['user_login']))
             return
         else:
             update_settingsx(misc_support="None")
@@ -96,28 +100,32 @@ async def user_history(call: CallbackQuery, state: FSMContext):
 
 # Возвращение к профилю
 @dp.callback_query_handler(text="user_profile", state="*")
-async def user_profile_return(message: Union['Message', 'CallbackQuery'] , state: FSMContext):
+async def user_profile_return(message: Union['Message', 'CallbackQuery'], state: FSMContext):
     me = await bot.get_me()
-    await message.message.edit_text(open_profile_my(message.from_user.id, me), reply_markup=profile_open_inl)
+    await message.message.edit_caption(open_profile_my(message.from_user.id, me), reply_markup=profile_open_inl)
 
 
 # Referer system
-@dp.callback_query_handler(text="user_referer")
-async def user_referer(call: CallbackQuery ,state: FSMContext):
+@dp.message_handler(text="🤑 Реферальная система")
+async def user_referer(message: Message, state: FSMContext):
     percent = config.PERCENT
     me = await bot.get_me()
-    user_id = call.from_user.id
+    user_id = message.from_user.id
     link = 'https://t.me/' + me.username + '?start=' + str(user_id)
-    await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=
-        f'🤍 Реферальная система 🤍\n'
-        '\n'
-        '🔗<i> Ссылка: </i>\n'
-        f'<code>{link}</code>\n'
-        f'\n'
-        f'<i>📔 Наша реферальная система позволит вам заработать крупную сумму без вложений.'
-        f' Вам необходимо лишь давать свою ссылку друзьям и вы будете получать пожизненно {percent}% с их пополнений в боте</i>',
-        reply_markup=close_inl
-    )
+    await message.answer_photo(requests.get(
+        "https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content,
+                               caption=
+                               f'🤍 Реферальная система 🤍\n'
+                               '\n'
+                               '🔗<i> Ссылка: </i>\n'
+                               f'<code>{link}</code>\n'
+                               f'\n'
+                               f'<i>📔 Наша реферальная система позволит вам заработать крупную сумму без вложений.'
+                               f' Вам необходимо лишь давать свою ссылку друзьям и вы будете получать пожизненно {percent}% с их пополнений в боте</i>',
+                               reply_markup=close_inl
+                               )
+
+
 ################################################################################################
 ######################################### ПОКУПКА ТОВАРА #######################################
 ########################################### КАТЕГОРИИ ##########################################
@@ -130,7 +138,7 @@ async def user_purchase_category_open(call: CallbackQuery, state: FSMContext):
     get_positions = get_positionsx(category_id=category_id)
 
     if len(get_positions) >= 1:
-        await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
+        await call.message.edit_caption("<b>🎁 Выберите нужный вам товар:</b>",
                                      reply_markup=products_item_position_open_fp(0, category_id))
     else:
         await call.answer(f"❕ Товары в категории {get_category['category_name']} отсутствуют")
@@ -142,10 +150,10 @@ async def user_purchase_category_return(call: CallbackQuery, state: FSMContext):
     get_categories = get_all_categoriesx()
 
     if len(get_categories) >= 1:
-        await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
+        await call.message.edit_caption("<b>🎁 Выберите нужный вам товар:</b>",
                                      reply_markup=products_item_category_open_fp(0))
     else:
-        await call.message.edit_text("<b>🎁 Товары в данное время отсутствуют.</b>")
+        await call.message.edit_caption("<b>🎁 Товары в данное время отсутствуют.</b>")
         await call.answer("❗ Категории были изменены или удалены")
 
 
@@ -154,7 +162,7 @@ async def user_purchase_category_return(call: CallbackQuery, state: FSMContext):
 async def user_purchase_category_next_page(call: CallbackQuery, state: FSMContext):
     remover = int(call.data.split(":")[1])
 
-    await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
+    await call.message.edit_caption("<b>🎁 Выберите нужный вам товар:</b>",
                                  reply_markup=products_item_category_next_page_fp(remover))
 
 
@@ -163,7 +171,7 @@ async def user_purchase_category_next_page(call: CallbackQuery, state: FSMContex
 async def user_purchase_category_prev_page(call: CallbackQuery, state: FSMContext):
     remover = int(call.data.split(":")[1])
 
-    await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
+    await call.message.edit_caption("<b>🎁 Выберите нужный вам товар:</b>",
                                  reply_markup=products_item_category_back_page_fp(remover))
 
 
@@ -198,7 +206,7 @@ async def user_purchase_position_open(call: CallbackQuery, state: FSMContext):
         await call.message.answer_photo(get_position['position_photo'],
                                         send_msg, reply_markup=products_open_finl(position_id, remover, category_id))
     else:
-        await call.message.edit_text(send_msg,
+        await call.message.edit_caption(send_msg,
                                      reply_markup=products_open_finl(position_id, remover, category_id))
 
 
@@ -212,10 +220,10 @@ async def user_purchase_position_return(call: CallbackQuery, state: FSMContext):
 
     if len(get_positions) >= 1:
         await call.message.delete()
-        await call.message.answer("<b>🎁 Выберите нужный вам товар:</b>",
+        await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption="<b>🎁 Выберите нужный вам товар:</b>",
                                   reply_markup=products_item_position_open_fp(remover, category_id))
     else:
-        await call.message.edit_text("<b>🎁 Товары в данное время отсутствуют.</b>")
+        await call.message.edit_caption("<b>🎁 Товары в данное время отсутствуют.</b>")
         await call.answer("❗ Позиции были изменены или удалены")
 
 
@@ -225,7 +233,7 @@ async def user_purchase_position_next_page(call: CallbackQuery, state: FSMContex
     remover = int(call.data.split(":")[1])
     category_id = int(call.data.split(":")[2])
 
-    await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
+    await call.message.edit_caption("<b>🎁 Выберите нужный вам товар:</b>",
                                  reply_markup=products_item_position_next_page_fp(remover, category_id))
 
 
@@ -261,7 +269,7 @@ async def user_purchase_select(call: CallbackQuery, state: FSMContext):
             await state.finish()
 
             await call.message.delete()
-            await call.message.answer(f"<b>🎁 Вы действительно хотите купить товар(ы)?</b>\n"
+            await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>🎁 Вы действительно хотите купить товар(ы)?</b>\n"
                                       f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                       f"🎁 Товар: <code>{get_position['position_name']}</code>\n"
                                       f"📦 Количество: <code>1шт</code>\n"
@@ -272,7 +280,7 @@ async def user_purchase_select(call: CallbackQuery, state: FSMContext):
             await state.set_state("here_item_count")
 
             await call.message.delete()
-            await call.message.answer(f"<b>🎁 Введите количество товаров для покупки</b>\n"
+            await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>🎁 Введите количество товаров для покупки</b>\n"
                                       f"▶ От <code>1</code> до <code>{get_count}</code>\n"
                                       f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                       f"🎁 Товар: <code>{get_position['position_name']}</code> - <code>{get_position['position_price']}₽</code>\n"
@@ -313,21 +321,21 @@ async def user_purchase_select_count(message: Message, state: FSMContext):
             if 1 <= get_count <= len(get_items):
                 if int(get_user['user_balance']) >= amount_pay:
                     await state.finish()
-                    await message.answer(f"<b>🎁 Вы действительно хотите купить товар(ы)?</b>\n"
+                    await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>🎁 Вы действительно хотите купить товар(ы)?</b>\n"
                                          f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                          f"🎁 Товар: <code>{get_position['position_name']}</code>\n"
                                          f"📦 Количество: <code>{get_count}шт</code>\n"
                                          f"💰 Сумма к покупке: <code>{amount_pay}₽</code>",
                                          reply_markup=products_confirm_finl(position_id, get_count))
                 else:
-                    await message.answer(f"<b>❌ Недостаточно средств на счете.</b>\n" + send_message)
+                    await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>❌ Недостаточно средств на счете.</b>\n" + send_message)
             else:
-                await message.answer(f"<b>❌ Неверное количество товаров.</b>\n" + send_message)
+                await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>❌ Неверное количество товаров.</b>\n" + send_message)
         else:
             await state.finish()
-            await message.answer("<b>🎁 Товар который вы хотели купить, закончился</b>")
+            await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption="<b>🎁 Товар который вы хотели купить, закончился</b>")
     else:
-        await message.answer(f"<b>❌ Данные были введены неверно.</b>\n" + send_message)
+        await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>❌ Данные были введены неверно.</b>\n" + send_message)
 
 
 # Подтверждение покупки товара
@@ -338,7 +346,7 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
     get_count = int(call.data.split(":")[3])
 
     if get_action == "yes":
-        await call.message.edit_text("<b>🔄 Ждите, товары подготавливаются</b>")
+        await call.message.edit_caption("<b>🔄 Ждите, товары подготавливаются</b>")
 
         get_position = get_positionx(position_id=position_id)
         get_items = get_itemsx(position_id=position_id)
@@ -371,7 +379,7 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                               get_position['position_name'], "\n".join(save_items), buy_time, receipt,
                               get_user['user_balance'], int(get_user['user_balance'] - amount_pay))
 
-                await call.message.answer(f"<b>✅ Вы успешно купили товар(ы)</b>\n"
+                await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>✅ Вы успешно купили товар(ы)</b>\n"
                                           f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
                                           f"🧾 Чек: <code>#{receipt}</code>\n"
                                           f"🎁 Товар: <code>{get_position['position_name']} | {get_count}шт | {amount_pay}₽</code>\n"
@@ -381,13 +389,13 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
 
 
             else:
-                await call.message.answer("<b>❗ На вашем счёте недостаточно средств</b>")
+                await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption="<b>❗ На вашем счёте недостаточно средств</b>")
         else:
-            await call.message.answer("<b>🎁 Товар который вы хотели купить закончился или изменился.</b>",
+            await call.message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption="<b>🎁 Товар который вы хотели купить закончился или изменился.</b>",
                                       reply_markup=menu_frep(call.from_user.id))
     else:
         if len(get_all_categoriesx()) >= 1:
-            await call.message.edit_text("<b>🎁 Выберите нужный вам товар:</b>",
+            await call.message.edit_caption("<b>🎁 Выберите нужный вам товар:</b>",
                                          reply_markup=products_item_category_open_fp(0))
         else:
-            await call.message.edit_text("<b>✅ Вы отменили покупку товаров.</b>")
+            await call.message.edit_caption("<b>✅ Вы отменили покупку товаров.</b>")

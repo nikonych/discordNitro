@@ -52,12 +52,8 @@ async def on_startup_notify(dp: Dispatcher):
 # Рассылка сообщения всем администраторам
 async def send_admins(message, markup=None, not_me=0):
     for admin in get_admins():
-        if markup == "default": markup = menu_frep(admin)
-        elif markup[:2] == "wm":
-            user_id = markup[2:].split(':')[0]
-            amount = markup[2:].split(':')[1]
-            message_id = markup[2:].split(':')[2]
-            markup = check_wm(user_id, amount, message_id)
+        if markup == "default":
+            markup = menu_frep(admin)
 
         try:
             if str(admin) != str(not_me):
@@ -187,8 +183,7 @@ def open_profile_my(user_id, me):
            f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
            f"👑 Заработано с рефералов: <code>{get_user['user_referer_balance']}₽</code>\n" \
            f"🤍 Количество рефералов: <code>{count}</code>\n" \
-           f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
-           f"💵 Всего пополнено: <code>{get_user['user_refill']}₽</code>\n" \
+
 
 
 # Открытие профиля при поиске

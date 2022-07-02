@@ -2,7 +2,7 @@
 import requests
 
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InputFile
 
 from tgbot.keyboards.inline_user import user_support_finl
 from tgbot.keyboards.reply_z_all import menu_frep
@@ -89,7 +89,9 @@ async def filter_refill(call: CallbackQuery, state: FSMContext):
 @dp.message_handler( text=['⬅ Главное меню', '/start'], state="*")
 async def main_start(message: Message, state: FSMContext):
     await state.finish()
-    await message.answer_photo(requests.get("https://cdn.discordapp.com/attachments/932998144168460308/985925024181542952/photo_2022-06-13_18-13-44.jpg").content, caption=f"<b>👋 Приветик {message.from_user.first_name}!</b>\n"
+    print("start")
+    # print(open('tgbot/data/resourses/photo/main.jpg', 'rb').name)
+    await message.answer_photo(open('tgbot/data/resourses/photo/main.jpg', 'rb'), caption=f"<b>👋 Приветик {message.from_user.first_name}!</b>\n"
                          "❤️ Добро пожаловать в самый лучший магазин, по продаже Discord Nitro!!!\n"
                          " ",
                          reply_markup=menu_frep(message.from_user.id))

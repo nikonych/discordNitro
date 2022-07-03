@@ -13,17 +13,19 @@ def profile_search_finl(user_id):
     ).add(
         ikb("🎁 Покупки", callback_data=f"user_purchases:{user_id}"),
         ikb("💌 Отправить СМС", callback_data=f"user_message:{user_id}")
-    ).add(
-        ikb("🔄 Обновить", callback_data=f"user_refresh:{user_id}")
     )
     if not isBan(user_id):
         keyboard.add(
             ikb("❌ Забанить", callback_data=f"user_ban:True:{user_id}")
-        )
+        ).add(
+        ikb("🔄 Обновить", callback_data=f"user_refresh:{user_id}")
+    )
     else:
         keyboard.add(
             ikb("✅ Разбанить", callback_data=f"user_ban:False:{user_id}")
-        )
+        ).add(
+        ikb("🔄 Обновить", callback_data=f"user_refresh:{user_id}")
+    )
 
 
     return keyboard

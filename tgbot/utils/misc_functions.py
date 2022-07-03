@@ -211,7 +211,7 @@ def open_profile_search(user_id):
         for items in get_purchases:
             count_items += int(items['purchase_count'])
     text = f"<b>👮‍♀️ Профиль пользователя: <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a></b>\n" \
-           f"➖➖➖➖➖➖➖➖➖➖\n"
+           f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
     if get_user['user_role'] == 'VIP':
         date = datetime.fromisoformat(get_user['vip_date'])
         text += f"😎 Cтатус: <code>{get_user['user_role']} ({convert_day((date - datetime.now()).days)})</code> \n"

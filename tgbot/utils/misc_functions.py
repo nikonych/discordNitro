@@ -217,7 +217,7 @@ def open_profile_search(user_id):
         text += f"😎 Cтатус: <code>{get_user['user_role']} ({convert_day((date - datetime.now()).days)})</code> \n"
     else:
         text += f"😎 Cтатус: <code>{get_user['user_role']} </code> \n"
-
+    count = len(referer_count(user_id))
     text += f"🆔 ID: <code>{get_user['user_id']}</code>\n" \
            f"👤 Логин: <b>@{get_user['user_login']}</b>\n" \
            f"Ⓜ Имя: <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a>\n" \
@@ -225,7 +225,10 @@ def open_profile_search(user_id):
            f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
            f"💰 Баланс: <code>{get_user['user_balance']}₽</code>\n" \
            f"💰 Всего пополнено: <code>{get_user['user_refill']}₽</code>\n" \
-           f"🎁 Куплено товаров: <code>{count_items}шт</code>"
+           f"🎁 Куплено товаров: <code>{count_items}шт</code>\n" \
+            f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+            f"👑 Заработано с рефералов: <code>{get_user['user_referer_balance']}₽</code>\n" \
+            f"🤍 Количество рефералов: <code>{count}</code>\n"
 
     return text
 

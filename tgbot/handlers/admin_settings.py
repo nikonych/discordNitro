@@ -106,6 +106,30 @@ async def settings_edit_faq(call: CallbackQuery, state: FSMContext):
                                  "<code>▶ {firstname}</code> - имя пользователя")
 
 
+@dp.callback_query_handler(IsAdmin(), text_startswith="settings_edit_vip", state="*")
+async def settings_edit_faq(call: CallbackQuery, state: FSMContext):
+    await state.set_state("here_settings_vip")
+    await call.message.edit_text("<b>ℹ Введите новый текст для VIP</b>\n"
+                                 "❕ Вы можете использовать заготовленный синтаксис и HTML разметку:\n"
+                                 )
+
+
+@dp.message_handler(IsAdmin(), state="here_settings_vip")
+async def settings_faq_get(message: Message, state: FSMContext):
+    get_message = get_faq(message.from_user.id, message.text)
+
+    try:
+        cache_msg = await message.answer(get_message)
+        await state.finish()
+        update_settingsx(misc_vip=message.text)
+
+        await cache_msg.edit_text("<b>✅ Правила были успешно изменены</b>")
+        await message.answer("<b>🖍 Изменение настроек бота.</b>", reply_markup=settings_open_finl())
+    except CantParseEntities:
+        await message.answer("<b>❌ Ошибка синтаксиса HTML.</b>\n"
+                             "ℹ Введите новый текст для VIP")
+
+
 # Принятие нового текста для FAQ
 @dp.message_handler(IsAdmin(), state="here_settings_faq")
 async def settings_faq_get(message: Message, state: FSMContext):

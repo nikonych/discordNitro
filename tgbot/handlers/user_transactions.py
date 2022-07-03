@@ -142,7 +142,6 @@ async def refill_check_form(call: CallbackQuery):
     payment = crystal.construct_payment_by_id(receipt)
 
     isPaid = payment.if_paid()
-
     if isPaid:
         get_refill = get_refillx(refill_receipt=receipt)
         if get_refill is None:

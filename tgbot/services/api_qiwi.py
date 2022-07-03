@@ -222,32 +222,32 @@ class QiwiAPI(AsyncClass):
                                  f"💰 Сумма пополнения: <code>{get_amount}₽</code>\n" \
                                  f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
                                  f"🔄 После оплаты, нажмите на <code>Проверить оплату</code>"
-            elif get_way == "Number":
-                send_requests = f"https://qiwi.com/payment/form/99?extra%5B%27account%27%5D={self.login}&amountInteger=" \
-                                f"{get_amount}&amountFraction=0&extra%5B%27comment%27%5D={receipt}&currency=" \
-                                f"643&blocked%5B0%5D=sum&blocked%5B1%5D=comment&blocked%5B2%5D=account"
-
-                return_message = f"<b>🆙 Пополнение баланса</b>\n" \
-                                 f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
-                                 f"🥝 Для пополнения баланса, нажмите на кнопку ниже \n<code>Перейти к оплате</code> и оплатите выставленный вам счёт\n" \
-                                 f"📞 QIWI кошелёк: <code>{self.login}</code>\n" \
-                                 f"🏷 Комментарий: <code>{receipt}</code>\n" \
-                                 f"💰 Сумма пополнения: <code>{get_amount}₽</code>\n" \
-                                 f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
-                                 f"🔄 После оплаты, нажмите на <code>Проверить оплату</code>"
-            elif get_way == "Nickname":
-                send_requests = f"https://qiwi.com/payment/form/99999?amountInteger={get_amount}&amountFraction=0&currency=643" \
-                                f"&extra%5B%27comment%27%5D={receipt}&extra%5B%27account%27%5D={self.nickname}&blocked%5B0%5D=" \
-                                f"comment&blocked%5B1%5D=account&blocked%5B2%5D=sum&0%5Bextra%5B%27accountType%27%5D%5D=nickname"
-
-                return_message = f"<b>🆙 Пополнение баланса</b>\n" \
-                                 f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
-                                 f"🥝 Для пополнения баланса, нажмите на кнопку ниже \n<code>Перейти к оплате</code> и оплатите выставленный вам счёт\n" \
-                                 f"Ⓜ QIWI Никнейм: <code>{self.nickname}</code>\n" \
-                                 f"🏷 Комментарий: <code>{receipt}</code>\n" \
-                                 f"💰 Сумма пополнения: <code>{get_amount}₽</code>\n" \
-                                 f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
-                                 f"🔄 После оплаты, нажмите на <code>Проверить оплату</code>"
+            # elif get_way == "Number":
+            #     send_requests = f"https://qiwi.com/payment/form/99?extra%5B%27account%27%5D={self.login}&amountInteger=" \
+            #                     f"{get_amount}&amountFraction=0&extra%5B%27comment%27%5D={receipt}&currency=" \
+            #                     f"643&blocked%5B0%5D=sum&blocked%5B1%5D=comment&blocked%5B2%5D=account"
+            #
+            #     return_message = f"<b>🆙 Пополнение баланса</b>\n" \
+            #                      f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+            #                      f"🥝 Для пополнения баланса, нажмите на кнопку ниже \n<code>Перейти к оплате</code> и оплатите выставленный вам счёт\n" \
+            #                      f"📞 QIWI кошелёк: <code>{self.login}</code>\n" \
+            #                      f"🏷 Комментарий: <code>{receipt}</code>\n" \
+            #                      f"💰 Сумма пополнения: <code>{get_amount}₽</code>\n" \
+            #                      f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+            #                      f"🔄 После оплаты, нажмите на <code>Проверить оплату</code>"
+            # elif get_way == "Nickname":
+            #     send_requests = f"https://qiwi.com/payment/form/99999?amountInteger={get_amount}&amountFraction=0&currency=643" \
+            #                     f"&extra%5B%27comment%27%5D={receipt}&extra%5B%27account%27%5D={self.nickname}&blocked%5B0%5D=" \
+            #                     f"comment&blocked%5B1%5D=account&blocked%5B2%5D=sum&0%5Bextra%5B%27accountType%27%5D%5D=nickname"
+            #
+            #     return_message = f"<b>🆙 Пополнение баланса</b>\n" \
+            #                      f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+            #                      f"🥝 Для пополнения баланса, нажмите на кнопку ниже \n<code>Перейти к оплате</code> и оплатите выставленный вам счёт\n" \
+            #                      f"Ⓜ QIWI Никнейм: <code>{self.nickname}</code>\n" \
+            #                      f"🏷 Комментарий: <code>{receipt}</code>\n" \
+            #                      f"💰 Сумма пополнения: <code>{get_amount}₽</code>\n" \
+            #                      f"➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
+            #                      f"🔄 После оплаты, нажмите на <code>Проверить оплату</code>"
 
             return return_message, send_requests, receipt
         return False, False, False

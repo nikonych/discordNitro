@@ -88,6 +88,20 @@ def get_all_users_id():
         sql = "SELECT user_id FROM storage_users"
         return con.execute(sql).fetchall()
 
+
+def get_last_admins():
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = lambda cursor, row: row[0]
+        sql = "SELECT user_id FROM storage_users where user_role= 'Admin'"
+        return con.execute(sql).fetchall()
+
+
+def get_vip():
+    with sqlite3.connect(DATABASE_PATH) as con:
+        con.row_factory = lambda cursor, row: row[0]
+        sql = "SELECT user_id FROM storage_users where user_role= 'VIP'"
+        return con.execute(sql).fetchall()
+
 # referer count
 def referer_count(user_id):
     with sqlite3.connect(DATABASE_PATH) as con:
@@ -545,7 +559,7 @@ def create_dbx():
         con.row_factory = dict_factory
 
         # Создание БД с хранением данных пользователей
-        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 11:
+        if len(con.execute("PRAGMA table_info(storage_users)").fetchall()) == 13:
             print("DB was found(1/10)")
         else:
             con.execute("CREATE TABLE storage_users("
@@ -559,7 +573,9 @@ def create_dbx():
                         "user_unix INTEGER,"
                         "user_referer INTEGER DEFAULT 0,"
                         "user_referer_balance INTEGER DEFAULT 0,"
-                        "is_banned boolean default FALSE)")
+                        "is_banned boolean default FALSE,"
+                        "user_role text default 'Guest',"
+                        "vip_date text)")
             print("DB was not found(1/10) | Creating...")
 
         # Создание БД с хранением данных платежных систем
@@ -582,7 +598,7 @@ def create_dbx():
             print("DB was not found(2/10) | Creating...")
 
         # Создание БД с хранением настроек
-        if len(con.execute("PRAGMA table_info(storage_settings)").fetchall()) == 9:
+        if len(con.execute("PRAGMA table_info(storage_settings)").fetchall()) == 10:
             print("DB was found(3/10)")
         else:
             con.execute("CREATE TABLE storage_settings("
@@ -594,7 +610,8 @@ def create_dbx():
                         "misc_bot TEXT,"
                         "misc_update TEXT,"
                         "misc_profit_day INTEGER,"
-                        "misc_profit_week INTEGER)")
+                        "misc_profit_week INTEGER,"
+                        "misc_vip text default 'vip')")
 
             con.execute("INSERT INTO storage_settings("
                         "status_work, status_refill, status_buy, misc_faq, misc_support, misc_bot, misc_update, misc_profit_day, misc_profit_week)"

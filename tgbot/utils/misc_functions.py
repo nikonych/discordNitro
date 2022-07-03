@@ -1,5 +1,6 @@
 # - *- coding: utf- 8 - *-
 import asyncio
+from datetime import datetime
 
 import requests
 from aiogram import Dispatcher
@@ -11,7 +12,7 @@ from tgbot.keyboards.reply_z_all import menu_frep
 from tgbot.loader import bot
 from tgbot.services.api_sqlite import get_settingsx, update_settingsx, get_userx, get_purchasesx, get_all_positionsx, \
     update_positionx, get_all_categoriesx, get_all_purchasesx, get_all_refillx, get_all_usersx, get_all_itemsx, \
-    get_itemsx, get_positionx, get_categoryx, referer_count
+    get_itemsx, get_positionx, get_categoryx, referer_count, get_vip, update_userx
 from tgbot.utils.const_functions import get_unix, convert_day
 
 # bot created by @djimbox
@@ -77,6 +78,12 @@ async def update_profit_week():
 
 # Автоматическая проверка обновления каждые 24 часа
 async def check_update():
+    for vip in get_vip():
+        user = get_userx(user_id=vip)
+        date = datetime.fromisoformat(user['vip_date'])
+        if (date - datetime.now()).days <= 0:
+            update_userx(user_id=vip, user_role='Покупатель', vip_date='vip')
+
     update_link = "https://sites.google.com/view/check-update-autoshop/main-page"
 
     response = requests.get(update_link)
@@ -115,7 +122,6 @@ async def upload_text(dp, get_text):
     await asyncio.sleep(0.5)
     response = await session.post("http://pastie.org/pastes/create",
                                   data={"language": "plaintext", "content": get_text})
-
     return response.url
 
 
@@ -172,17 +178,24 @@ def open_profile_my(user_id, me):
     if len(get_purchases) >= 1:
         for items in get_purchases:
             count_items += int(items['purchase_count'])
-    link = 'https://t.me/' + me.username + '?start=' + str(user_id)
     count = len(referer_count(user_id))
-    return f"<b>👮‍♀️ Ваш профиль:</b>\n" \
-           f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
-           f"🆔 ID: <code>{get_user['user_id']}</code>\n" \
+
+
+    text = f"<b>👮‍♀️ Ваш профиль:</b>\n" \
+           f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n"
+    if get_user['user_role'] == 'VIP':
+        date = datetime.fromisoformat(get_user['vip_date'])
+        text += f"😎 Ваш статус: <code>{get_user['user_role']} ({convert_day((date - datetime.now()).days)})</code> \n"
+    else:
+        text += f"😎 Ваш статус: <code>{get_user['user_role']} </code> \n"
+    text += f"🆔 ID: <code>{get_user['user_id']}</code>\n" \
            f"💰 Баланс: <code>{get_user['user_balance']}₽</code>\n" \
            f"🎁 Куплено товаров: <code>{count_items}шт</code>\n" \
            f"🕰 Регистрация: <code>{get_user['user_date'].split(' ')[0]} ({convert_day(how_days)})</code>\n" \
            f"➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖\n" \
            f"👑 Заработано с рефералов: <code>{get_user['user_referer_balance']}₽</code>\n" \
-           f"🤍 Количество рефералов: <code>{count}</code>\n" \
+           f"🤍 Количество рефералов: <code>{count}</code>\n"
+    return text
 
 
 

@@ -100,6 +100,8 @@ def user_support_finl(user_name):
     keyboard = InlineKeyboardMarkup(
     ).add(
         InlineKeyboardButton("💌 Написать", url=f"https://t.me/{user_name}"),
+    ).add(
+        InlineKeyboardButton("Закрыть", callback_data="close_this")
     )
 
     return keyboard

@@ -2,6 +2,7 @@
 import logging as bot_logger
 import os
 import sys
+from datetime import datetime
 
 import colorama
 from aiogram import executor, Dispatcher
@@ -12,7 +13,7 @@ from tgbot.handlers import dp
 from tgbot.loader import scheduler
 from tgbot.middlewares import setup_middlewares
 from tgbot.services.api_session import RequestsSession
-from tgbot.services.api_sqlite import create_dbx
+from tgbot.services.api_sqlite import create_dbx, update_userx, get_last_admins, get_vip, get_userx
 from tgbot.utils.misc.bot_commands import set_commands
 from tgbot.utils.misc_functions import check_update, check_bot_data, on_startup_notify, update_profit_day, \
     update_profit_week
@@ -42,6 +43,10 @@ async def on_startup(dp: Dispatcher):
     print(Fore.LIGHTBLUE_EX + "~~~~~ TG developer: @djimbox ~~~~~")
     print(Fore.RESET)
     if len(get_admins()) == 0: print("***** ENTER ADMIN ID IN settings.ini *****")
+    for admin in get_last_admins():
+        update_userx(user_id=admin, user_role='Buyer')
+    for admin in get_admins():
+        update_userx(user_id=admin, user_role='Admin')
 
 
 # Выполнение функции после выключения бота

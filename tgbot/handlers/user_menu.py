@@ -1,15 +1,17 @@
 # - *- coding: utf- 8 - *-
 import asyncio
+import datetime
 from typing import Union
 
 import requests
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
+from dateutil import relativedelta
 
 from tgbot.data import config
 from tgbot.data.config import bot_description
-from tgbot.keyboards.inline_user import user_support_finl, products_open_finl, products_confirm_finl
-from tgbot.keyboards.inline_z_all import profile_open_inl, close_inl, close_referer
+from tgbot.keyboards.inline_user import user_support_finl, products_open_finl, products_confirm_finl, refill_choice_finl
+from tgbot.keyboards.inline_z_all import profile_open_inl, close_inl, close_referer, buy_vip_inl
 from tgbot.keyboards.inline_z_page import *
 from tgbot.keyboards.reply_z_all import menu_frep
 from tgbot.loader import dp, bot
@@ -35,7 +37,6 @@ async def user_shop(message: Message, state: FSMContext):
 @dp.message_handler(IsBan(), text="👮‍♀️ Профиль", state="*")
 async def user_profile(message: Message, state: FSMContext):
     await state.finish()
-
     me = await bot.get_me()
     await message.answer_photo(open('tgbot/data/resourses/photo/profile.jpg', 'rb'), caption=open_profile_my(message.from_user.id, me), reply_markup=profile_open_inl)
 
@@ -50,7 +51,7 @@ async def user_faq(message: Message, state: FSMContext):
         send_message = f"ℹ Информация. Измените её в настройках бота.\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n{bot_description}"
 
     await message.answer_photo(open('tgbot/data/resourses/photo/rule.jpg', 'rb'),
-                               caption=get_faq(message.from_user.id, send_message))
+                               caption=get_faq(message.from_user.id, send_message), reply_markup=close_inl)
 
 
 # Открытие сообщения с ссылкой на поддержку
@@ -97,6 +98,46 @@ async def user_history(call: CallbackQuery, state: FSMContext):
         await call.answer("❗ У вас отсутствуют покупки", True)
 
 
+@dp.callback_query_handler(text="buy_vip", state="*")
+async def user_buy_vip(call: CallbackQuery, state: FSMContext):
+    await state.finish()
+
+    send_message = get_settingsx()['misc_vip']
+    if send_message == "None" or send_message == None or send_message == 'vip':
+        send_message = f"ℹ Информация. Измените её в настройках бота.\n➖➖➖➖➖➖➖➖➖➖➖➖➖\n{bot_description}"
+
+    await call.message.edit_caption(
+                               caption=send_message, reply_markup=buy_vip_inl)
+
+
+@dp.callback_query_handler(text="buy_vip_money", state="*")
+async def user_buy_vip(call: CallbackQuery, state: FSMContext):
+    await state.finish()
+
+    user = get_userx(user_id=call.from_user.id)
+    balance = user['user_balance']
+    nextmonth = datetime.date.today() + relativedelta.relativedelta(months=1)
+    if user['user_role'] != 'VIP' and user['user_role'] != 'Админ':
+        if balance >= 750:
+            update_userx(user_id=call.from_user.id, user_balance=balance-750, user_role='VIP', vip_date=nextmonth)
+            await call.answer("🎁 Покупка прошла успешно!")
+            me = await bot.get_me()
+            await call.message.edit_caption(caption=open_profile_my(call.from_user.id, me), reply_markup=profile_open_inl)
+        else:
+            await call.answer("❗ У вас недостаточно средств!")
+            get_kb = refill_choice_finl()
+
+            if get_kb is not None:
+                await call.message.edit_caption("<b>💰 Выберите способ пополнения</b>",
+                                                reply_markup=get_kb)
+            else:
+                await call.answer("⛔ Пополнение временно недоступно", True)
+    elif user['user_role'] == 'Админ':
+        await call.answer("❗ Зачем? Вы же Админ!")
+    else:
+        await call.answer("❗ У вас уже есть VIP!")
+
+
 # Возвращение к профилю
 @dp.callback_query_handler(text="user_profile", state="*")
 async def user_profile_return(message: Union['Message', 'CallbackQuery'], state: FSMContext):
@@ -135,9 +176,10 @@ async def user_purchase_category_open(call: CallbackQuery, state: FSMContext):
     get_category = get_categoryx(category_id=category_id)
     get_positions = get_positionsx(category_id=category_id)
 
+
     if len(get_positions) >= 1:
         await call.message.edit_caption("<b>🎁 Выберите нужный вам товар:</b>",
-                                     reply_markup=products_item_position_open_fp(0, category_id))
+                                     reply_markup=products_item_position_open_fp(0, category_id, call.from_user.id))
     else:
         await call.answer(f"❕ Товары в категории {get_category['category_name']} отсутствуют")
 
@@ -181,9 +223,12 @@ async def user_purchase_position_open(call: CallbackQuery, state: FSMContext):
     remover = int(call.data.split(":")[2])
     category_id = int(call.data.split(":")[3])
 
+    get_user = get_userx(user_id=call.from_user.id)
     get_position = get_positionx(position_id=position_id)
     get_category = get_categoryx(category_id=category_id)
     get_items = get_itemsx(position_id=position_id)
+    if get_user['user_role'] == "VIP":
+        get_position['position_price'] = get_position['position_price'] / 2
 
     if get_position['position_description'] == "0":
         text_description = ""
@@ -219,7 +264,7 @@ async def user_purchase_position_return(call: CallbackQuery, state: FSMContext):
     if len(get_positions) >= 1:
         await call.message.delete()
         await call.message.answer_photo(open('tgbot/data/resourses/photo/buy.jpg', 'rb'), caption="<b>🎁 Выберите нужный вам товар:</b>",
-                                  reply_markup=products_item_position_open_fp(remover, category_id))
+                                  reply_markup=products_item_position_open_fp(remover, category_id, call.from_user.id))
     else:
         await call.message.edit_caption("<b>🎁 Товары в данное время отсутствуют.</b>")
         await call.answer("❗ Позиции были изменены или удалены")
@@ -254,6 +299,8 @@ async def user_purchase_select(call: CallbackQuery, state: FSMContext):
     get_position = get_positionx(position_id=position_id)
     get_items = get_itemsx(position_id=position_id)
     get_user = get_userx(user_id=call.from_user.id)
+    if get_user['user_role'] == "VIP":
+        get_position['position_price'] = get_position['position_price'] / 2
 
     if get_position['position_price'] != 0:
         get_count = int(get_user['user_balance'] / get_position['position_price'])
@@ -297,6 +344,8 @@ async def user_purchase_select_count(message: Message, state: FSMContext):
     get_position = get_positionx(position_id=position_id)
     get_user = get_userx(user_id=message.from_user.id)
     get_items = get_itemsx(position_id=position_id)
+    if get_user['user_role'] == "VIP":
+        get_position['position_price'] = get_position['position_price'] / 2
 
     if get_position['position_price'] != 0:
         get_count = int(get_user['user_balance'] / get_position['position_price'])
@@ -313,7 +362,8 @@ async def user_purchase_select_count(message: Message, state: FSMContext):
 
     if message.text.isdigit():
         get_count = int(message.text)
-        amount_pay = int(get_position['position_price']) * get_count
+        print(get_position['position_price'])
+        amount_pay = int(get_position['position_price'] * get_count)
 
         if len(get_items) >= 1:
             if 1 <= get_count <= len(get_items):
@@ -349,6 +399,8 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
         get_position = get_positionx(position_id=position_id)
         get_items = get_itemsx(position_id=position_id)
         get_user = get_userx(user_id=call.from_user.id)
+        if get_user['user_role'] == "VIP":
+            get_position['position_price'] = get_position['position_price'] / 2
 
         amount_pay = int(get_position['position_price'] * get_count)
 
@@ -383,6 +435,8 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                                           f"🎁 Товар: <code>{get_position['position_name']} | {get_count}шт | {amount_pay}₽</code>\n"
                                           f"🕰 Дата покупки: <code>{buy_time}</code>",
                                           reply_markup=menu_frep(call.from_user.id))
+                if get_user['user_role'] != "VIP" and get_user['user_role'] != "Admin" and get_user['user_role'] != "Buyer":
+                    update_userx(user_id=get_user['user_id'], user_role='Buyer')
 
 
 

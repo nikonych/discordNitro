@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import CantParseEntities
 
 from tgbot.keyboards.inline_admin import profile_search_finl
-from tgbot.keyboards.inline_z_all import ad_confirm_inl
+from tgbot.keyboards.inline_z_all import ad_confirm_inl, close_inl
 from tgbot.loader import dp, bot
 from tgbot.services.api_sqlite import *
 from tgbot.utils.misc.bot_filters import IsAdmin
@@ -63,7 +63,7 @@ async def functions_ad_make(message, user_id):
 
     for user in get_users:
         try:
-            await bot.send_message(user['user_id'], message, disable_web_page_preview=True)
+            await bot.send_message(user['user_id'], message, disable_web_page_preview=True, reply_markup=close_inl)
             receive_users += 1
         except:
             block_users += 1

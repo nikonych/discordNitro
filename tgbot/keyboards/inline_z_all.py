@@ -12,8 +12,9 @@ ad_confirm_inl = InlineKeyboardMarkup(
 profile_open_inl = InlineKeyboardMarkup(
 ).add(
     InlineKeyboardButton("💰 Пополнить", callback_data="user_refill"),
-    InlineKeyboardButton("🎁 Мои покупки", callback_data="user_history"),
-
+    InlineKeyboardButton("🎁 Мои покупки", callback_data="user_history")
+).add(
+    InlineKeyboardButton("😎 VIP Подписка", callback_data="buy_vip")
 )
 
 
@@ -22,12 +23,21 @@ profile_open_inl = InlineKeyboardMarkup(
 # Удаление сообщения
 close_inl = InlineKeyboardMarkup(
 ).add(
-    InlineKeyboardButton("❌ Закрыть", callback_data="close_this"),
+    InlineKeyboardButton("Закрыть", callback_data="close_this"),
 )
 
 
 close_referer = InlineKeyboardMarkup(
 
+).add(
+    InlineKeyboardButton("⬅ Вернуться ↩", callback_data="user_profile")
+)
+
+
+buy_vip_inl = InlineKeyboardMarkup(
+
+).add(
+    InlineKeyboardButton("✅ Купить VIP", callback_data="buy_vip_money")
 ).add(
     InlineKeyboardButton("⬅ Вернуться ↩", callback_data="user_profile")
 )

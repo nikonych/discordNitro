@@ -87,10 +87,18 @@ def settings_open_finl():
     else:
         faq_kb = ikb("Установлено ✅", callback_data="settings_edit_faq")
 
+
+    if None == get_settings['misc_vip'] or get_settings['misc_vip'] == 'vip':
+        vip_kb = ikb("Не установлено ❌", callback_data="settings_edit_vip")
+    else:
+        vip_kb = ikb("Установлено ✅", callback_data="settings_edit_vip")
+
     keyboard.add(
         ikb("📕 Правила", callback_data="..."), faq_kb
     ).add(
         ikb("☎ Контакты", callback_data="..."), support_kb
+    ).add(
+        ikb("😎 VIP", callback_data="..."), vip_kb
     )
 
     return keyboard

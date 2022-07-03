@@ -1,7 +1,7 @@
 # - *- coding: utf- 8 - *-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton as ikb
 
-from tgbot.services.api_sqlite import get_all_categoriesx, get_itemsx, get_positionsx
+from tgbot.services.api_sqlite import get_all_categoriesx, get_itemsx, get_positionsx, get_userx
 
 cpage = 10
 
@@ -646,7 +646,7 @@ def products_item_category_back_page_fp(remover):
 
 ########################################### ПОЗИЦИИ ##########################################
 # Стартовые страницы позиций для покупки товаров
-def products_item_position_open_fp(remover, category_id):
+def products_item_position_open_fp(remover, category_id, user_id):
     get_positions = get_positionsx(category_id=category_id)
     keyboard = InlineKeyboardMarkup()
     count = 0
@@ -654,6 +654,9 @@ def products_item_position_open_fp(remover, category_id):
     for a in range(remover, len(get_positions)):
         if count < cpage:
             get_items = get_itemsx(position_id=get_positions[a]['position_id'])
+            get_user = get_userx(user_id=user_id)
+            if get_user['user_role'] == "VIP":
+                get_positions[a]['position_price'] = get_positions[a]['position_price'] / 2
             keyboard.add(ikb(
                 f"{get_positions[a]['position_name']} | {get_positions[a]['position_price']}₽ | {len(get_items)} шт",
                 callback_data=f"buy_position_open:{get_positions[a]['position_id']}:{remover}:{category_id}"))

@@ -210,10 +210,15 @@ def open_profile_search(user_id):
     if len(get_purchases) >= 1:
         for items in get_purchases:
             count_items += int(items['purchase_count'])
+    text = f"<b>👮‍♀️ Профиль пользователя: <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a></b>\n" \
+           f"➖➖➖➖➖➖➖➖➖➖\n"
+    if get_user['user_role'] == 'VIP':
+        date = datetime.fromisoformat(get_user['vip_date'])
+        text += f"😎 Cтатус: <code>{get_user['user_role']} ({convert_day((date - datetime.now()).days)})</code> \n"
+    else:
+        text += f"😎 Cтатус: <code>{get_user['user_role']} </code> \n"
 
-    return f"<b>👮‍♀️ Профиль пользователя: <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a></b>\n" \
-           f"➖➖➖➖➖➖➖➖➖➖\n" \
-           f"🆔 ID: <code>{get_user['user_id']}</code>\n" \
+    text += f"🆔 ID: <code>{get_user['user_id']}</code>\n" \
            f"👤 Логин: <b>@{get_user['user_login']}</b>\n" \
            f"Ⓜ Имя: <a href='tg://user?id={get_user['user_id']}'>{get_user['user_name']}</a>\n" \
            f"🕰 Регистрация: <code>{get_user['user_date']} ({convert_day(how_days)})</code>\n" \
@@ -221,6 +226,8 @@ def open_profile_search(user_id):
            f"💰 Баланс: <code>{get_user['user_balance']}₽</code>\n" \
            f"💰 Всего пополнено: <code>{get_user['user_refill']}₽</code>\n" \
            f"🎁 Куплено товаров: <code>{count_items}шт</code>"
+
+    return text
 
 
 # Статистика бота

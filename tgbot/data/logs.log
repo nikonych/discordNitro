@@ -1,2 +1,66 @@
 ERROR | 2022-07-03 23:11:50,692 | main.py:41 | BOT WAS STARTED
 NoneType: None
+ERROR | 2022-07-04 01:40:59,333 | dispatcher.py:390 | Cause exception while getting updates.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 139, in make_request
+    async with session.post(url, data=req, **kwargs) as response:
+  File "/usr/lib/python3/dist-packages/aiohttp/client.py", line 1138, in __aenter__
+    self._resp = await self._coro
+  File "/usr/lib/python3/dist-packages/aiohttp/client.py", line 559, in _request
+    await resp.start(conn)
+  File "/usr/lib/python3/dist-packages/aiohttp/client_reqrep.py", line 898, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+  File "/usr/lib/python3/dist-packages/aiohttp/streams.py", line 616, in read
+    await self._waiter
+aiohttp.client_exceptions.ClientOSError: [Errno 104] Connection reset by peer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 381, in start_polling
+    updates = await self.bot.get_updates(
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/bot.py", line 110, in get_updates
+    result = await self.request(api.Methods.GET_UPDATES, payload)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/base.py", line 231, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 142, in make_request
+    raise exceptions.NetworkError(f"aiohttp client throws an error: {e.__class__.__name__}: {e}")
+aiogram.utils.exceptions.NetworkError: Aiohttp client throws an error: ClientOSError: [Errno 104] Connection reset by peer
+ERROR | 2022-07-04 01:46:04,825 | dispatcher.py:390 | Cause exception while getting updates.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 381, in start_polling
+    updates = await self.bot.get_updates(
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/bot.py", line 110, in get_updates
+    result = await self.request(api.Methods.GET_UPDATES, payload)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/base.py", line 231, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 139, in make_request
+    async with session.post(url, data=req, **kwargs) as response:
+  File "/usr/lib/python3/dist-packages/aiohttp/client.py", line 1138, in __aenter__
+    self._resp = await self._coro
+  File "/usr/lib/python3/dist-packages/aiohttp/client.py", line 559, in _request
+    await resp.start(conn)
+  File "/usr/lib/python3/dist-packages/aiohttp/client_reqrep.py", line 893, in start
+    with self._timer:
+  File "/usr/lib/python3/dist-packages/aiohttp/helpers.py", line 721, in __exit__
+    raise asyncio.TimeoutError from None
+asyncio.exceptions.TimeoutError
+ERROR | 2022-07-04 05:28:13,814 | dispatcher.py:390 | Cause exception while getting updates.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/dispatcher/dispatcher.py", line 381, in start_polling
+    updates = await self.bot.get_updates(
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/bot.py", line 110, in get_updates
+    result = await self.request(api.Methods.GET_UPDATES, payload)
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/base.py", line 231, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "/usr/local/lib/python3.10/dist-packages/aiogram/bot/api.py", line 139, in make_request
+    async with session.post(url, data=req, **kwargs) as response:
+  File "/usr/lib/python3/dist-packages/aiohttp/client.py", line 1138, in __aenter__
+    self._resp = await self._coro
+  File "/usr/lib/python3/dist-packages/aiohttp/client.py", line 559, in _request
+    await resp.start(conn)
+  File "/usr/lib/python3/dist-packages/aiohttp/client_reqrep.py", line 893, in start
+    with self._timer:
+  File "/usr/lib/python3/dist-packages/aiohttp/helpers.py", line 721, in __exit__
+    raise asyncio.TimeoutError from None
+asyncio.exceptions.TimeoutError

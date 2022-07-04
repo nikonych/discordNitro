@@ -117,7 +117,7 @@ async def user_buy_vip(call: CallbackQuery, state: FSMContext):
     user = get_userx(user_id=call.from_user.id)
     balance = user['user_balance']
     nextmonth = datetime.date.today() + relativedelta.relativedelta(months=1)
-    if user['user_role'] != 'VIP' and user['user_role'] != 'Админ':
+    if user['user_role'] != 'VIP' and user['user_role'] != 'Admin':
         if balance >= 750:
             update_userx(user_id=call.from_user.id, user_balance=balance-750, user_role='VIP', vip_date=nextmonth)
             await call.answer("🎁 Покупка прошла успешно!")
@@ -132,7 +132,7 @@ async def user_buy_vip(call: CallbackQuery, state: FSMContext):
                                                 reply_markup=get_kb)
             else:
                 await call.answer("⛔ Пополнение временно недоступно", True)
-    elif user['user_role'] == 'Админ':
+    elif user['user_role'] == 'Admin':
         await call.answer("❗ Зачем? Вы же Админ!")
     else:
         await call.answer("❗ У вас уже есть VIP!")

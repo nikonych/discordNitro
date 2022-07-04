@@ -86,10 +86,9 @@ async def filter_refill(call: CallbackQuery, state: FSMContext):
 ####################################################################################################
 ############################################## ПРОЧЕЕ ##############################################
 # Открытие главного меню
-@dp.message_handler( text=['⬅ Главное меню', '/start'], state="*")
+@dp.message_handler(text=['⬅ Главное меню', '/start'], state="*")
 async def main_start(message: Message, state: FSMContext):
     await state.finish()
-    print("start")
     # print(open('tgbot/data/resourses/photo/main.jpg', 'rb').name)
     await message.answer_photo(open('tgbot/data/resourses/photo/main.jpg', 'rb'), caption=f"<b>👋 Приветик {message.from_user.first_name}!</b>\n"
                          "❤️ Добро пожаловать в самый лучший магазин, по продаже Discord Nitro!!!\n"

@@ -11,7 +11,7 @@ from tgbot.keyboards.inline_admin import payment_choice_finl
 from tgbot.loader import dp
 from tgbot.services.api_crystal import CrystalAPI
 from tgbot.services.api_qiwi import QiwiAPI
-from tgbot.services.api_sqlite import update_paymentx, get_paymentx, update_crystal, get_crystal, update_yoo
+from tgbot.services.api_sqlite import update_paymentx, get_paymentx, update_crystal, get_crystal, update_yoo, get_yoo
 from tgbot.services.api_YooMoney import YooMoneyAPI
 from tgbot.utils.misc.bot_filters import IsAdmin
 
@@ -44,6 +44,10 @@ async def payment_systems_edit(call: CallbackQuery):
             await call.answer("❗ Добавьте Crystal перед включением Способов пополнений.", True)
     elif way_pay == 'YooMoney':
         try:
+            yoo = get_yoo()
+
+            client = Client(yoo['token'])
+            user = client.account_info()
             if way_status == 'False':
                 update_yoo(status=0)
             else:
@@ -289,7 +293,7 @@ async def payment_yoomoney_get_code(message: Message, state: FSMContext):
     if token != False:
         client = Client(token)
         user = client.account_info()
-        update_yoo(client_id=client_id, token=token, redirect_uri=redirect, wallet=user.account)
+        update_yoo(client_id=client_id, token=token, redirect_uri=redirect, wallet=user.account, status=True)
         await message.answer("<b>YooMoney был успешно изменён</b>")
     else:
         await message.answer("<b>YooMoney данные не прошли проверку</b>")

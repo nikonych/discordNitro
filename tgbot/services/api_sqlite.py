@@ -705,6 +705,10 @@ def create_dbx():
                         "login  TEXT,"
                         "secret TEXT,"
                         "status boolean)")
+            con.execute("INSERT INTO storage_crystal("
+                        "status) "
+                        "VALUES (?)",
+                        [False])
             print("DB was not found(9/10) | Creating...")
 
         if len(con.execute("PRAGMA table_info(storage_ymoney)").fetchall()) == 5:
@@ -717,6 +721,10 @@ def create_dbx():
                             "client_id text,"\
                             "redirect_uri text"\
                         ")")
+            con.execute("INSERT INTO storage_ymoney("
+                        "status) "
+                        "VALUES (?)",
+                        [False])
             print("DB was not found(10/10) | Creating...")
 
         con.commit()
